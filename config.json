@@ -1,0 +1,7 @@
+{
+    "MQTT": {
+        "broker": "localhost",
+        "client_id": "client",
+        "port": 1883
+    }
+}
