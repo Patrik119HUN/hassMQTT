@@ -14,9 +14,10 @@ class MQTTManager:
         return cls._instance
 
     def __init__(self) -> None:
-        _client_id = self._cm["MQTT"]["client_id"]
-        _broker = self._cm["MQTT"]["broker"]
-        _port = self._cm["MQTT"]["port"]
+        _mqtt_settings = self._cm["MQTT"]
+        _client_id = _mqtt_settings["client_id"]
+        _broker = _mqtt_settings["broker"]
+        _port = _mqtt_settings["port"]
 
         self._mqtt_instance = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2,
