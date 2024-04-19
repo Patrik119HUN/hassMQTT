@@ -3,5 +3,11 @@
         "broker": "localhost",
         "client_id": "client",
         "port": 1883
-    }
+    },
+    "Modbus": {
+        "type": "serial",
+        "port": "/dev/ttyS0",
+        "baud_rate": 9600
+    },
+    "devices": {}
 }
