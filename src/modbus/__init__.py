@@ -4,17 +4,16 @@ from pymodbus.client import (
     ModbusSerialClient,
     ModbusUdpClient,
 )
-from config_manager import ConfigManager
+from config_manager import config_manager
 from utils.singleton import SingletonMeta
 from loguru import logger
 
 
 class ModbusManager(metaclass=SingletonMeta):
     _modbus_instance: ModbusBaseClient = None
-    _cm = ConfigManager("../config.json")
 
     def __init__(self):
-        _settings = self._cm["Modbus"]
+        _settings = config_manager["Modbus"]
         _type: str = _settings["type"]
         _port: int | str = _settings["port"]
         _host: str = "localhost"

@@ -1,12 +1,11 @@
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import MQTTProtocolVersion
-from config_manager import ConfigManager
+from config_manager import config_manager
 
 
 class MQTTManager:
     _instance = None
     _mqtt_instance: mqtt.Client = None
-    _cm = ConfigManager("../config.json")
 
     def __new__(cls, *args, **kwargs):
         if not isinstance(cls._instance, cls):
@@ -14,7 +13,7 @@ class MQTTManager:
         return cls._instance
 
     def __init__(self) -> None:
-        _mqtt_settings = self._cm["MQTT"]
+        _mqtt_settings = config_manager["MQTT"]
         _client_id = _mqtt_settings["client_id"]
         _broker = _mqtt_settings["broker"]
         _port = _mqtt_settings["port"]
