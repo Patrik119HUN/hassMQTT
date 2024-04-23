@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import MQTTProtocolVersion
-from config_manager import config_manager
+from shos.config_manager import config_manager
 
 
 class MQTTManager:

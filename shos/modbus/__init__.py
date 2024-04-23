@@ -5,8 +5,7 @@ from pymodbus.client import (
     ModbusSerialClient,
     ModbusUdpClient,
 )
-from config_manager import config_manager
-from utils.singleton import SingletonMeta
+from shos.config_manager import config_manager
 from loguru import logger
 from abc import ABC
 

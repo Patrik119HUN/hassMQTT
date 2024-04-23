@@ -30,7 +30,6 @@ class Device:
     via_device: Optional[str] = None
 
 
-@dataclass
 class EntityInfo(ABC):
     component: DeviceTypes
     device: Optional[Device] = None
