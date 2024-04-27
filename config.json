@@ -1,6 +1,6 @@
 {
     "MQTT": {
-        "broker": "localhost",
+        "broker": "broker.hivemq.com",
         "client_id": "client",
         "port": 1883
     },
