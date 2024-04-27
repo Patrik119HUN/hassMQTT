@@ -1,39 +1,9 @@
-from ..device import EntityInfo, DeviceTypes, Device
 from shos.utils.clamp import clamp
-from driver import LightDriver
-from json_encoders import *
+from shos.home_assistant.light.driver import LightDriver
+from shos.home_assistant.light.light import Light
+from shos.home_assistant.light.light_factory import register_light
 
 MAX_LIGHT_VALUE: int = 255
-
-
-class Light(EntityInfo):
-    __driver: LightDriver
-
-    def __init__(self, name: str):
-        self.component = DeviceTypes.LIGHT
-        self.device = Device(name=name)
-        self.name = name
-        self.unique_id = EntityInfo.generate_id()
-        pass
-
-    @property
-    def driver(self):
-        return self.__driver
-
-    @driver.setter
-    def driver(self, driver: LightDriver):
-        self.__driver = driver
-
-
-__lights: dict[str, Light] = {}
-
-
-def register_light(light_type: str):
-    def decorator(fn):
-        __lights[light_type] = fn
-        return fn
-
-    return decorator
 
 
 @register_light(light_type="binary")
@@ -47,6 +17,8 @@ class BinaryLight(Light):
     @state.setter
     def state(self, state: bool) -> None:
         self.__state = state
+        __value: int = 255 if self.__state is True else 0
+        self.driver.send_data(0, __value)
 
 
 @register_light(light_type="brightness")
@@ -60,6 +32,7 @@ class BrightnessLight(BinaryLight):
     @brightness.setter
     def brightness(self, brightness: int) -> None:
         self.__brightness = clamp(brightness, 0, MAX_LIGHT_VALUE)
+        self.driver.send_data(1, self.__brightness)
         self.state = True if self.__brightness != 0 else False
 
 
@@ -103,13 +76,3 @@ class RGBLight(BrightnessLight):
         self.__red = clamp(red, 0, MAX_LIGHT_VALUE)
         self.__green = clamp(green, 0, MAX_LIGHT_VALUE)
         self.__blue = clamp(blue, 0, MAX_LIGHT_VALUE)
-
-    @staticmethod
-    def get_encoder():
-        return RGBEncoder
-
-
-def get_light(light_type: str):
-    if light_type not in __lights:
-        raise RuntimeError("No such a light type")
-    return __lights[light_type]

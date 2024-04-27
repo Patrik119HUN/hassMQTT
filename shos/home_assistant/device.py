@@ -2,11 +2,11 @@ from dataclasses import dataclass
 import random
 import string
 from typing import Optional
-from enum import Enum
+from enum import StrEnum
 from abc import ABC
 
 
-class DeviceTypes(Enum):
+class DeviceTypes(StrEnum):
     SENSOR = "sensor"
     SWITCH = "switch"
     BINARY_SENSOR = "binary_sensor"
@@ -30,8 +30,10 @@ class Device:
     via_device: Optional[str] = None
 
 
-class EntityInfo(ABC):
+@dataclass
+class EntityInfo:
     component: DeviceTypes
+    name: str
     device: Optional[Device] = None
     device_class: Optional[str] = None
     enabled_by_default: Optional[bool] = None
@@ -39,11 +41,13 @@ class EntityInfo(ABC):
     expire_after: Optional[int] = None
     force_update: Optional[bool] = None
     icon: Optional[str] = None
-    name: str
     object_id: Optional[str] = None
     qos: Optional[int] = None
     unique_id: Optional[str] = None
 
-    @staticmethod
-    def generate_id(length: int = 8) -> str:
-        return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
+
+type Entity = EntityInfo
+
+
+def generate_id(length: int = 8) -> str:
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))

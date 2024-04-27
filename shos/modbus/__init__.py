@@ -1,32 +1,11 @@
-from typing import Any, Protocol
 from pymodbus.client import (
     ModbusTcpClient,
     ModbusSerialClient,
     ModbusUdpClient,
 )
-from shos.config_manager import config_manager
 from loguru import logger
-from abc import ABC
-from typing import Type
-
-
-class BaseModbus(ABC):
-    __modbus_instance = None
-    __settings: dict[str, Any] = config_manager["Modbus"]
-
-    def get_client(self):
-        return self.__modbus_instance
-
-
-_MODBUS: dict[str, Type[BaseModbus]] = {}
-
-
-def register_modbus(modbus_type: str):
-    def decorator(fn):
-        _MODBUS[modbus_type] = fn
-        return fn
-
-    return decorator
+from shos.modbus.factory import register_modbus
+from shos.modbus.base_modbus import BaseModbus
 
 
 @register_modbus(modbus_type="tcp")
@@ -59,10 +38,3 @@ class SerialModbus(BaseModbus):
             f"Serial Modbus instance is created on {__port} with {__baudrate} baud!"
         )
         self.__modbus_instance.connect()
-
-
-def get_modbus():
-    _type = config_manager["Modbus"]["type"]
-    if _type not in _MODBUS:
-        raise RuntimeError("No such a modbus type")
-    return _MODBUS[_type]().get_client()

@@ -9,5 +9,14 @@
         "port": "/dev/ttyS0",
         "baud_rate": 9600
     },
-    "devices": {}
+    "devices": {
+        "haloszoba": {
+            "type": "light",
+            "color_mode": "rgb",
+            "hardware": {
+                "type": "modbus",
+                "device_id": 12
+            }
+        }
+    }
 }
