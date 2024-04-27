@@ -22,9 +22,3 @@ class TopicBuilder:
         for x in self._list:
             temp += x + "/"
         return temp
-
-
-if __name__ == "__main__":
-    valami = TopicBuilder()
-    valami.add("alma").multi_level()
-    print(valami)
