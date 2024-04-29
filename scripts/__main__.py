@@ -1,13 +1,16 @@
-from shos.config_manager import config_manager
+import atexit
+import logging.config
+
+from shos.config_manager import load_config
 from typing import Any, Type
 from shos.home_assistant.light import *
-import json
 
+from pathlib import Path
 from shos.home_assistant.light.light_factory import get_light
 
 
 class DeviceMaker:
-    __device_json: dict[str, Any] = config_manager.get("devices")
+    __device_json: dict[str, Any] = None #config_manager.get("devices")
     __devices: list[Any]
 
     def create_devices(self):
@@ -29,9 +32,22 @@ class DeviceMaker:
         return self.__devices
 
 
+settings = load_config((Path(__file__).parent / "../logging.json").resolve())
+
+logger = logging.getLogger("alma")
+
+
 def main():
-    asd = DeviceMaker()
-    asd.create_devices()
+    logging.config.dictConfig(settings)
+
+    queue_handler = logging.getHandlerByName("queue_handler")
+    if queue_handler is not None:
+        queue_handler.listener.start()
+        atexit.register(queue_handler.listener.stop)
+
+    logger.warning("hiba")
+    # asd = DeviceMaker()
+    # asd.create_devices()
 
 
 if __name__ == "__main__":

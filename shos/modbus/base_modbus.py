@@ -9,5 +9,13 @@ class BaseModbus(ABC):
     __settings: dict[str, Any] = config_manager["Modbus"]
 
     @property
-    def client(self):
+    def settings(self):
+        return self.__settings
+
+    @property
+    def instance(self):
         return self.__modbus_instance
+
+    @instance.setter
+    def instance(self, new_instance: [ModbusBaseSyncClient]):
+        self.__modbus_instance = new_instance

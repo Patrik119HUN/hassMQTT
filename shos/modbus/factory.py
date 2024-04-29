@@ -18,4 +18,4 @@ def get_modbus() -> [ModbusBaseSyncClient]:
     _type = config_manager["Modbus"]["type"]
     if _type not in _MODBUS:
         raise RuntimeError("No such a modbus type")
-    return _MODBUS[_type]().get_client()
+    return _MODBUS[_type]()

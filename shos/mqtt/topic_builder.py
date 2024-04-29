@@ -1,24 +1,41 @@
-class TopicBuilder:
-    _list: list[str] = []
+from enum import Enum, auto
 
-    def __init__(self) -> None:
-        self._list = list()
+
+class TopicType(Enum):
+    SUBSCRIBER = auto()
+    PUBLISHER = auto()
+
+
+class Topic:
+    __list: list[str] = []
+    __topic_type: TopicType = None
+
+    def __init__(self, topic_type: TopicType) -> None:
+        self.__topic_type = topic_type
+        self.__list = list()
         pass
 
     def add(self, value: str):
-        self._list.append(value)
+        self.__list.append(value)
         return self
 
-    def single_level(self):
-        self._list += "+"
+    def add_single_level(self):
+        if self.__topic_type == TopicType.PUBLISHER:
+            raise RuntimeError("Wildcards are not allowed in publisher topic")
+        self.__list += "+"
         return self
 
-    def multi_level(self):
-        self._list += "#"
+    def add_multi_level(self):
+        if self.__topic_type == TopicType.PUBLISHER:
+            raise RuntimeError("Wildcards are not allowed in publisher topic")
+        self.__list += "#"
         return self
 
-    def __str__(self) -> str:
+    def build(self) -> str:
         temp: str = ""
-        for x in self._list:
+        for x in self.__list:
             temp += x + "/"
         return temp
+
+    def __str__(self) -> str:
+        return self.build()

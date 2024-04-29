@@ -5,7 +5,7 @@ import time
 from pymodbus import ModbusException
 from pymodbus.client.base import ModbusBaseSyncClient
 
-from shos.modbus import get_modbus
+from shos.modbus.factory import get_modbus
 
 
 class LightDriver(ABC):
