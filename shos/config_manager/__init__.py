@@ -12,8 +12,3 @@ def load_config(file_name: str | Path) -> dict[str, Any]:
     except ValueError:
         raise RuntimeError("Not valid JSON")
     return _data
-
-
-CONFIG_FILE = (Path(__file__).parent.parent / "../config.json").resolve()
-
-config_manager: dict[str, Any] = load_config(CONFIG_FILE)
