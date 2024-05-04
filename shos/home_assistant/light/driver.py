@@ -5,8 +5,6 @@ import time
 from pymodbus import ModbusException
 from pymodbus.client.base import ModbusBaseSyncClient
 
-from shos.modbus.factory import get_modbus
-
 
 class LightDriver(ABC):
     @abstractmethod
@@ -28,7 +26,10 @@ class LightDriver(ABC):
 
 class ModbusDriver(LightDriver):
     __id: int = 0
-    __modbus: [ModbusBaseSyncClient] = get_modbus()
+    __modbus: [ModbusBaseSyncClient] = None
+
+    def __init__(self, modbus_instance: ModbusBaseSyncClient):
+        self.__modbus = modbus_instance
 
     def connect(self, *args, **kwargs):
         if "id" not in kwargs:
