@@ -1,32 +1,21 @@
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import MQTTProtocolVersion
-from shos.config_manager import config_manager
 
 
 class MQTTManager:
-    _instance = None
-    _mqtt_instance: mqtt.Client = None
+    __mqtt_instance: mqtt.Client = None
 
-    def __new__(cls, *args, **kwargs):
-        if not isinstance(cls._instance, cls):
-            cls._instance = super(MQTTManager, cls).__new__(cls)
-        return cls._instance
-
-    def __init__(self) -> None:
-        _mqtt_settings = config_manager["MQTT"]
-        _client_id = _mqtt_settings["client_id"]
-        _broker = _mqtt_settings["broker"]
-        _port = _mqtt_settings["port"]
-
+    def __init__(self, client_id: str, broker: str, port: int) -> None:
         self._mqtt_instance = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2,
-            client_id=_client_id,
+            client_id=client_id,
             protocol=MQTTProtocolVersion.MQTTv5,
         )
-        self._mqtt_instance.connect(host=_broker, port=_port)
-        self._mqtt_instance.on_connect = self._on_connect
+        self._mqtt_instance.connect(host=broker, port=port)
+        self._mqtt_instance.on_connect = self.__on_connect
 
-    def _on_connect(client, userdata, flags, reason_code, properties):
+    @staticmethod
+    def __on_connect(client, userdata, flags, reason_code, properties):
         if reason_code.is_failure:
             print(f"Failed to connect: {reason_code}. retrying")
 
