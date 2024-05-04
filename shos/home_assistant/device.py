@@ -3,7 +3,6 @@ import random
 import string
 from typing import Optional
 from enum import StrEnum
-from abc import ABC
 
 
 class DeviceTypes(StrEnum):
