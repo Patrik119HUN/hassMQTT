@@ -2,6 +2,7 @@ from shos.utils.clamp import clamp
 from shos.home_assistant.light.driver import LightDriver
 from shos.home_assistant.light.light import Light
 from shos.home_assistant.light.light_factory import register_light
+import logging
 
 MAX_LIGHT_VALUE: int = 255
 
@@ -41,6 +42,7 @@ class RGBLight(BrightnessLight):
     __red: int = 0
     __green: int = 0
     __blue: int = 0
+    __logger = logging.getLogger(__name__)
 
     @property
     def red(self) -> int:
@@ -56,15 +58,18 @@ class RGBLight(BrightnessLight):
 
     @red.setter
     def red(self, value: int) -> None:
-        self.__red = value
+        self.__red = clamp(value, 0, MAX_LIGHT_VALUE)
+        self.driver.send_data(0, self.__red)
 
     @green.setter
     def green(self, value: int) -> None:
-        self.__green = value
+        self.__green = clamp(value, 0, MAX_LIGHT_VALUE)
+        self.driver.send_data(1, self.__green)
 
     @blue.setter
     def blue(self, value: int) -> None:
-        self.__blue = value
+        self.__blue = clamp(value, 0, MAX_LIGHT_VALUE)
+        self.driver.send_data(2, self.__blue)
 
     @property
     def color(self) -> tuple[int, int, int]:
@@ -73,6 +78,6 @@ class RGBLight(BrightnessLight):
     @color.setter
     def color(self, colors) -> None:
         red, green, blue = colors
-        self.__red = clamp(red, 0, MAX_LIGHT_VALUE)
-        self.__green = clamp(green, 0, MAX_LIGHT_VALUE)
-        self.__blue = clamp(blue, 0, MAX_LIGHT_VALUE)
+        self.red = red
+        self.green = green
+        self.blue = blue

@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from loguru import logger
-import time
 
 from pymodbus import ModbusException
 from pymodbus.client.base import ModbusBaseSyncClient
@@ -33,11 +32,9 @@ class ModbusDriver(LightDriver):
 
     def connect(self, *args, **kwargs):
         if "id" not in kwargs:
-            raise RuntimeError("No device id specified")
+            raise RuntimeError("No slave id specified")
         self.__id = kwargs["id"]
         logger.info(f"Connecting to {self.__id}")
-        time.sleep(1)
-        logger.info(f"Succesfully connected")
 
     def disconnect(self):
         logger.info(f"Disconnecting from {self.__id}")
@@ -45,8 +42,11 @@ class ModbusDriver(LightDriver):
     def send_data(self, address: int, value: int):
         try:
             self.__modbus.write_register(address=address, value=value, slave=self.__id)
+            logger.debug(f"Writing register to {self.__id} with {value} value")
         except ModbusException as e:
-            logger.error(f"Modbus write error at id: {self.__id}, address:{address}, {e}")
+            logger.error(
+                f"Modbus write error at id: {self.__id}, address:{address}, {e}"
+            )
             raise RuntimeError(e)
 
     def get_data(self):

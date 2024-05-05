@@ -3,7 +3,7 @@ from shos.home_assistant.light.driver import LightDriver
 
 
 class Light(EntityInfo):
-    __driver: [LightDriver]
+    __driver: LightDriver
 
     def __init__(self, name: str):
         self.component = DeviceTypes.LIGHT
@@ -19,3 +19,4 @@ class Light(EntityInfo):
     @driver.setter
     def driver(self, driver_instance: LightDriver):
         self.__driver = driver_instance
+        print(f"driver set to {driver_instance}")
