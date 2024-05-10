@@ -1,6 +1,6 @@
-from shos.home_assistant.light.light import Light
+from shos.home_assistant.device import Entity
 
-__lights: dict[str, Light] = {}
+__lights: dict[str, Entity] = {}
 
 
 def register_light(light_type: str):

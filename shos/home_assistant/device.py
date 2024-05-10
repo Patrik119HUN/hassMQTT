@@ -1,23 +1,11 @@
-from dataclasses import dataclass
-import random
-import string
+from dataclasses import dataclass, field
+from shos.home_assistant.abstract_driver import AbstractDriver
 from typing import Optional
-from enum import StrEnum
-
-
-class DeviceTypes(StrEnum):
-    SENSOR = "sensor"
-    SWITCH = "switch"
-    BINARY_SENSOR = "binary_sensor"
-    LIGHT = "light"
-    COVER = "cover"
-    CLIMATE = "climate"
-    FAN = "fan"
-    ALARM_PANEL = "alarm_control_panel"
+from shos.utils.id_generator import generate_id
 
 
 @dataclass
-class Device:
+class Hardware:
     name: str
     model: Optional[str] = None
     manufacturer: Optional[str] = None
@@ -29,24 +17,22 @@ class Device:
     via_device: Optional[str] = None
 
 
-@dataclass
-class EntityInfo:
-    component: DeviceTypes
+class MQTTEntitySettings:
+    qos: int
+    expire_after: int = None
+
+
+@dataclass(init=False)
+class Entity:
     name: str
-    device: Optional[Device] = None
+    device: Optional[Hardware] = field(default=None, repr=False)
     device_class: Optional[str] = None
-    enabled_by_default: Optional[bool] = None
-    entity_category: Optional[str] = None
-    expire_after: Optional[int] = None
-    force_update: Optional[bool] = None
     icon: Optional[str] = None
-    object_id: Optional[str] = None
-    qos: Optional[int] = None
-    unique_id: Optional[str] = None
+    unique_id: str = field(default_factory=generate_id)
+    driver: AbstractDriver = None
 
-
-type Entity = EntityInfo
-
-
-def generate_id(length: int = 8) -> str:
-    return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
+    def __init__(self, name: str, device: Hardware = None, device_class: str = None, icon: str = None):
+        self.name = name
+        self.device = device
+        self.device_class = device_class
+        self.icon = icon

@@ -1,15 +1,16 @@
 from shos.utils.clamp import clamp
-from shos.home_assistant.light.driver import LightDriver
-from shos.home_assistant.light.light import Light
+from shos.home_assistant.device import Entity
 from shos.home_assistant.light.light_factory import register_light
-import logging
 
 MAX_LIGHT_VALUE: int = 255
 
 
 @register_light(light_type="binary")
-class BinaryLight(Light):
+class BinaryLight(Entity):
     __state: bool = False
+
+    def __init__(self, name: str):
+        Device.__init__(self, name=name)
 
     @property
     def state(self) -> bool:
@@ -42,7 +43,6 @@ class RGBLight(BrightnessLight):
     __red: int = 0
     __green: int = 0
     __blue: int = 0
-    __logger = logging.getLogger(__name__)
 
     @property
     def red(self) -> int:

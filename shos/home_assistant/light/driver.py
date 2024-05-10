@@ -1,29 +1,11 @@
-from abc import ABC, abstractmethod
 from loguru import logger
 
 from pymodbus import ModbusException
 from pymodbus.client.base import ModbusBaseSyncClient
+from shos.home_assistant.abstract_driver import AbstractDriver
 
 
-class LightDriver(ABC):
-    @abstractmethod
-    def connect(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def disconnect(self):
-        pass
-
-    @abstractmethod
-    def send_data(self, address: int, value: int):
-        pass
-
-    @abstractmethod
-    def get_data(self):
-        pass
-
-
-class ModbusDriver(LightDriver):
+class ModbusDriver(AbstractDriver):
     __id: int = 0
     __modbus: [ModbusBaseSyncClient] = None
 
