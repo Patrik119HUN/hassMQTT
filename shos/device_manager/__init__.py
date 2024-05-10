@@ -1,46 +1,56 @@
 from typing import Any
-
+from shos.home_assistant.binary_sensor import BinarySensor
 from shos.home_assistant.light.driver import ModbusDriver
 from shos.home_assistant.light.light_factory import get_light
-from pymodbus.client import ModbusBaseClient
-import logging
+from pymodbus.client.base import ModbusBaseSyncClient
+from dataclasses import dataclass
+from loguru import logger
 
 
-class DeviceMaker:
-    __devices_dict: dict[str, Any] = None
-    __devices: list[Any] = []
-    __modbus_manager: ModbusBaseClient
-    __logger = logging.getLogger(__name__)
+@dataclass
+class Device:
+    name: str
+    type: str
+    color_mode: str
+    device_id: int
+    hardware_type: str
 
-    def __init__(self, devices: dict[str, Any], modbus_manager: ModbusBaseClient):
-        self.__devices_dict = devices
-        self.__modbus_manager = modbus_manager
 
-    def create_devices(self):
-        for props in self.__devices_dict:
-            device = None
-            match props["type"]:
-                case "light":
-                    device = get_light(props["color_mode"])(props["name"])
-                    self.__logger.debug(f"created an {device} light")
-                case "binary_sensor":
-                    self.__logger.info("Not implemented yet")
-                case "alarm":
-                    self.__logger.info("Not implemented yet")
-                case _:
-                    print("none")
+modbus_manager: ModbusBaseSyncClient
 
-            match props["hardware_type"]:
-                case "modbus":
-                    __driver = ModbusDriver(self.__modbus_manager)
-                    __driver.connect(id=1)
-                case "can":
-                    self.__logger.info("Not implemented yet")
-                case "hat":
-                    self.__logger.info("Not implemented yet")
-            device.driver = __driver
-            self.__devices.append(device)
 
-    @property
-    def devices(self):
-        return self.__devices
+def create_devices(device_list: list[Device]) -> list[Any]:
+    devices: list[Any] = []
+    for device in device_list:
+        dev = device_factory(device.type, device.name)
+        driver = driver_factory(device.hardware_type)
+
+        dev.driver = driver
+        devices.append(dev)
+        return devices
+
+
+def device_factory(device_type: str, name: str, **kwargs):
+    created_dev = None
+    match device_type:
+        case "light":
+            created_dev = get_light(kwargs["color_mode"])(name)
+        case "binary_sensor":
+            created_dev = BinarySensor(name)
+        case "alarm":
+            raise NotImplemented("Alarm not implemented yet")
+    logger.debug(f"created an {created_dev} light")
+    return created_dev
+
+
+def driver_factory(hardware_type: str, **kwargs):
+    created_driver = None
+    match hardware_type:
+        case "modbus":
+            created_driver = ModbusDriver(kwargs["modbus_manager"])
+            created_driver.connect(id=kwargs["device_id"])
+        case "can":
+            raise NotImplemented("CAN driver implemented yet")
+        case "hat":
+            raise NotImplemented("Built in driver implemented yet")
+    return created_driver
