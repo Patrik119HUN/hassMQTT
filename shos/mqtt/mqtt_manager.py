@@ -1,18 +1,13 @@
-import paho.mqtt.client as mqtt
-from paho.mqtt.enums import MQTTProtocolVersion
+from paho.mqtt.client import Client, MQTTv5
 
 
 class MQTTManager:
-    __mqtt_instance: mqtt.Client = None
+    __mqtt_instance: Client = None
 
     def __init__(self, client_id: str, broker: str, port: int) -> None:
-        self._mqtt_instance = mqtt.Client(
-            mqtt.CallbackAPIVersion.VERSION2,
-            client_id=client_id,
-            protocol=MQTTProtocolVersion.MQTTv5,
-        )
-        self._mqtt_instance.connect(host=broker, port=port)
-        self._mqtt_instance.on_connect = self.__on_connect
+        self.__mqtt_instance = Client(client_id=client_id, protocol=MQTTv5)
+        self.__mqtt_instance.connect(host=broker, port=port)
+        self.__mqtt_instance.on_connect = self.__on_connect
 
     @staticmethod
     def __on_connect(client, userdata, flags, reason_code, properties):
