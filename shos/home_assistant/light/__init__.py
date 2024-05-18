@@ -19,12 +19,12 @@ class BinaryLight(Entity):
     @state.setter
     def state(self, state: bool) -> None:
         """
-        Sets the value of a driver's output to either 255 or 0 based on the state
-        of the function.
+        Updates the value of an int variable based on a logical expression and
+        sends it to a driver via a send_data call.
 
         Args:
-            state (bool): boolean state of an output signal, which is used to
-                determine the value of the output data when the function is called.
+            state (bool): binary value to be sent through the `driver.send_data()`
+                method.
 
         """
         self.__state = state
@@ -43,13 +43,15 @@ class BrightnessLight(BinaryLight):
     @brightness.setter
     def brightness(self, brightness: int) -> None:
         """
-        Sets the brightness level of a light device based on an input value within
-        a predetermined range, and sends the updated brightness value to the
-        device's driver via a communication channel.
+        Clamps the input `brightness` value to a range between 0 and `MAX_LIGHT_VALUE`,
+        then sends the clamped value to the `driver` module using the `send_data()`
+        method. The function also sets the state of the light to `True` if the
+        clamped value is non-zero, or `False` otherwise.
 
         Args:
-            brightness (int): 0-based brightness value that determines the level
-                of light emission produced by the lamp, with a maximum value of `MAX_LIGHT_VALUE`.
+            brightness (int): 0-100% dimming level of the LED strip, which is
+                clamped to the range [0, MAX_LIGHT_VALUE] and then sent as an
+                argument to the `send_data` method of the `driver` object.
 
         """
         self.__brightness = clamp(brightness, 0, MAX_LIGHT_VALUE)
@@ -97,19 +99,16 @@ class RGBLight(BrightnessLight):
     @color.setter
     def color(self, colors) -> None:
         """
-        Sets `self.red`, `self.green`, and `self.blue` to the specified values,
-        assigning them as properties of the function object.
+        Sets attributes for a object, `self`, to assign values for `red`, `green`,
+        and `blue` colors respectively.
 
         Args:
-            colors (`array`.): 3 primary colors: red, green, and blue, which are
-                assigned to instance variables `self.red`, `self.green`, and
-                `self.blue`, respectively.
+            colors (enumeration (or 'tag').): 3 RGB colors that will be used to
+                define the color of the component.
                 
-                		- `red`: A property with the value of red, which is a primary color.
-                		- `green`: A property with the value of green, which is also a
-                primary color.
-                		- `blue`: A property with the value of blue, which is another
-                primary color.
+                		- `red`: The `red` property has the value `'red'`.
+                		- `green`: The `green` property has the value `'green'`.
+                		- `blue`: The `blue` property has the value `'blue'`.
 
         """
         red, green, blue = colors

@@ -10,6 +10,11 @@ config_manager: dict[str, Any] = load_config(CONFIG_FILE)
 
 
 def main():
+    """
+    Sets up logging configuration, creates a Modbus manager, connects it to the
+    devices, and then creates and returns a list of devices with the desired colors.
+
+    """
     logging.config.dictConfig(config_manager["logging"])
     modbus_manager = get_modbus(**config_manager["modbus"])
     modbus_manager.connect()
