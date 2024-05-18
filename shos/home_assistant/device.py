@@ -32,6 +32,19 @@ class Entity:
     driver: AbstractDriver = None
 
     def __init__(self, name: str, device: Hardware = None, device_class: str = None, icon: str = None):
+        """
+        Initializes an instance variable `self.name`, `self.device`, `self.device_class`,
+        and `self.icon`.
+
+        Args:
+            name (str): device's name.
+            device (None): device to which the documentation will be generated for.
+            device_class (None): categorical type of device being processed by the
+                function, with values including `Desktop`, `Laptop`, and `Tablet`.
+            icon (None): 2D icon to be displayed next to the device in the list,
+                as specified by its value.
+
+        """
         self.name = name
         self.device = device
         self.device_class = device_class
