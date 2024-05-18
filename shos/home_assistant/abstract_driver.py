@@ -11,7 +11,7 @@ class AbstractDriver(ABC):
         pass
 
     @abstractmethod
-    def send_data(self, address: int, value: int):
+    def send_data(self, address: int, value: int | bool):
         pass
 
     @abstractmethod

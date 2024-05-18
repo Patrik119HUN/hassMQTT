@@ -1,5 +1,5 @@
 from shos.utils.clamp import clamp
-from shos.home_assistant.device import Entity
+from shos.home_assistant.device import Entity, Hardware
 from shos.home_assistant.light.light_factory import register_light
 
 MAX_LIGHT_VALUE: int = 255
@@ -9,8 +9,8 @@ MAX_LIGHT_VALUE: int = 255
 class BinaryLight(Entity):
     __state: bool = False
 
-    def __init__(self, name: str):
-        Device.__init__(self, name=name)
+    def __init__( self, name: str, device: Hardware = None, device_class: str = None, icon: str = None, ):
+        Entity.__init__(self, name, device, device_class, icon)
 
     @property
     def state(self) -> bool:
@@ -19,8 +19,7 @@ class BinaryLight(Entity):
     @state.setter
     def state(self, state: bool) -> None:
         self.__state = state
-        __value: int = 255 if self.__state is True else 0
-        self.driver.send_data(0, __value)
+        self.driver.send_data(0, state)
 
 
 @register_light(light_type="brightness")

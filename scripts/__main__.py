@@ -20,7 +20,7 @@ def main():
     device_manager.modbus_manager = modbus_manager
     dev_list = device_manager.create_devices(asd)
     light = dev_list[0]
-    light.color = (0, 10, 55)
+    light.state = False
 
 
 if __name__ == "__main__":

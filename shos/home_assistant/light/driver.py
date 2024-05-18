@@ -7,7 +7,7 @@ from shos.home_assistant.abstract_driver import AbstractDriver
 
 class ModbusDriver(AbstractDriver):
     __id: int = 0
-    __modbus: [ModbusBaseSyncClient] = None
+    __modbus: ModbusBaseSyncClient = None
 
     def __init__(self, modbus_instance: ModbusBaseSyncClient):
         self.__modbus = modbus_instance
@@ -21,14 +21,15 @@ class ModbusDriver(AbstractDriver):
     def disconnect(self):
         logger.info(f"Disconnecting from {self.__id}")
 
-    def send_data(self, address: int, value: int):
+    def send_data(self, address: int, value: int | bool):
         try:
-            self.__modbus.write_register(address=address, value=value, slave=self.__id)
-            logger.debug(f"Writing register to {self.__id} with {value} value")
+            if type(value) is int:
+                self.__modbus.write_register(address=address, value=value, slave=self.__id)
+            else:
+                self.__modbus.write_coil(address=address, value=value, slave=self.__id)
+            logger.debug(f"Writing register to device at address {self.__id} with the value of {value}")
         except ModbusException as e:
-            logger.error(
-                f"Modbus write error at id: {self.__id}, address:{address}, {e}"
-            )
+            logger.error( f"Modbus write error at id: {self.__id}, address:{address}, {e}" )
             raise RuntimeError(e)
 
     def get_data(self):
