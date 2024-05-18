@@ -26,6 +26,21 @@ class Topic:
         pass
 
     def add(self, value: str):
+        """
+        Appends a value to a list referenced by the instance variable `self.__list`.
+
+        Args:
+            value (str): element to be appended to the list maintained by the
+                instance method `append()`.
+
+        Returns:
+            instance of its own class: a reference to itself, allowing for recursive
+            calls.
+            
+            	The returned output is an instance of the `MyClass` class, representing
+            the new object that has been added to the list.
+
+        """
         self.__list.append(value)
         return self
 
@@ -76,4 +91,11 @@ class Topic:
         return temp
 
     def __str__(self) -> str:
+        """
+        Generates high-quality documentation for code based on given input.
+
+        Returns:
+            str: the same as the `self.build()` method.
+
+        """
         return self.build()

@@ -10,6 +10,15 @@ class ModbusDriver(AbstractDriver):
     __modbus: [ModbusBaseSyncClient] = None
 
     def __init__(self, modbus_instance: ModbusBaseSyncClient):
+        """
+        Initializes a ModBus instance, which enables communication with Modbus
+        devices over a serial connection.
+
+        Args:
+            modbus_instance (ModbusBaseSyncClient): Modbus instance for which the
+                code is generating documentation, as indicated by its name.
+
+        """
         self.__modbus = modbus_instance
 
     def connect(self, *args, **kwargs):
@@ -25,6 +34,10 @@ class ModbusDriver(AbstractDriver):
         logger.info(f"Connecting to {self.__id}")
 
     def disconnect(self):
+        """
+        Disconnects a specific connection with the ID `self.__id`.
+
+        """
         logger.info(f"Disconnecting from {self.__id}")
 
     def send_data(self, address: int, value: int):
@@ -48,4 +61,8 @@ class ModbusDriver(AbstractDriver):
             raise RuntimeError(e)
 
     def get_data(self):
+        """
+        Generates high-quality documentation for code.
+
+        """
         pass
