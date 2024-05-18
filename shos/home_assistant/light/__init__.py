@@ -18,6 +18,15 @@ class BinaryLight(Entity):
 
     @state.setter
     def state(self, state: bool) -> None:
+        """
+        Sets the value of a driver's output to either 255 or 0 based on the state
+        of the function.
+
+        Args:
+            state (bool): boolean state of an output signal, which is used to
+                determine the value of the output data when the function is called.
+
+        """
         self.__state = state
         __value: int = 255 if self.__state is True else 0
         self.driver.send_data(0, __value)
@@ -33,6 +42,16 @@ class BrightnessLight(BinaryLight):
 
     @brightness.setter
     def brightness(self, brightness: int) -> None:
+        """
+        Sets the brightness level of a light device based on an input value within
+        a predetermined range, and sends the updated brightness value to the
+        device's driver via a communication channel.
+
+        Args:
+            brightness (int): 0-based brightness value that determines the level
+                of light emission produced by the lamp, with a maximum value of `MAX_LIGHT_VALUE`.
+
+        """
         self.__brightness = clamp(brightness, 0, MAX_LIGHT_VALUE)
         self.driver.send_data(1, self.__brightness)
         self.state = True if self.__brightness != 0 else False
@@ -77,6 +96,22 @@ class RGBLight(BrightnessLight):
 
     @color.setter
     def color(self, colors) -> None:
+        """
+        Sets `self.red`, `self.green`, and `self.blue` to the specified values,
+        assigning them as properties of the function object.
+
+        Args:
+            colors (`array`.): 3 primary colors: red, green, and blue, which are
+                assigned to instance variables `self.red`, `self.green`, and
+                `self.blue`, respectively.
+                
+                		- `red`: A property with the value of red, which is a primary color.
+                		- `green`: A property with the value of green, which is also a
+                primary color.
+                		- `blue`: A property with the value of blue, which is another
+                primary color.
+
+        """
         red, green, blue = colors
         self.red = red
         self.green = green
