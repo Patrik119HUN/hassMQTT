@@ -18,6 +18,15 @@ class BinaryLight(Entity):
 
     @state.setter
     def state(self, state: bool) -> None:
+        """
+        Updates the value of an int variable based on a logical expression and
+        sends it to a driver via a send_data call.
+
+        Args:
+            state (bool): binary value to be sent through the `driver.send_data()`
+                method.
+
+        """
         self.__state = state
         self.driver.send_data(0, state)
 
@@ -32,6 +41,18 @@ class BrightnessLight(BinaryLight):
 
     @brightness.setter
     def brightness(self, brightness: int) -> None:
+        """
+        Clamps the input `brightness` value to a range between 0 and `MAX_LIGHT_VALUE`,
+        then sends the clamped value to the `driver` module using the `send_data()`
+        method. The function also sets the state of the light to `True` if the
+        clamped value is non-zero, or `False` otherwise.
+
+        Args:
+            brightness (int): 0-100% dimming level of the LED strip, which is
+                clamped to the range [0, MAX_LIGHT_VALUE] and then sent as an
+                argument to the `send_data` method of the `driver` object.
+
+        """
         self.__brightness = clamp(brightness, 0, MAX_LIGHT_VALUE)
         self.driver.send_data(1, self.__brightness)
         self.state = True if self.__brightness != 0 else False
@@ -76,6 +97,19 @@ class RGBLight(BrightnessLight):
 
     @color.setter
     def color(self, colors) -> None:
+        """
+        Sets attributes for a object, `self`, to assign values for `red`, `green`,
+        and `blue` colors respectively.
+
+        Args:
+            colors (enumeration (or 'tag').): 3 RGB colors that will be used to
+                define the color of the component.
+                
+                		- `red`: The `red` property has the value `'red'`.
+                		- `green`: The `green` property has the value `'green'`.
+                		- `blue`: The `blue` property has the value `'blue'`.
+
+        """
         red, green, blue = colors
         self.red = red
         self.green = green
