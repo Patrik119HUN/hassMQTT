@@ -7,16 +7,17 @@ from shos.home_assistant.abstract_driver import AbstractDriver
 
 class ModbusDriver(AbstractDriver):
     __id: int = 0
-    __modbus: [ModbusBaseSyncClient] = None
+    __modbus: ModbusBaseSyncClient = None
 
     def __init__(self, modbus_instance: ModbusBaseSyncClient):
         """
-        Initializes a ModBus instance, which enables communication with Modbus
-        devices over a serial connection.
+        Initializes a Modbus instance, creating a connection to the RS-232 port
+        and setting up the necessary protocol structures for communication with a
+        Modbus slave device.
 
         Args:
-            modbus_instance (ModbusBaseSyncClient): Modbus instance for which the
-                code is generating documentation, as indicated by its name.
+            modbus_instance (ModbusBaseSyncClient): Modbus slave device instance
+                that the function will communicate with.
 
         """
         self.__modbus = modbus_instance
@@ -35,7 +36,8 @@ class ModbusDriver(AbstractDriver):
 
     def disconnect(self):
         """
-        Disconnects a specific connection with the ID `self.__id`.
+        Logs a message to the system logger indicating that the process with ID
+        `self.__id` is disconnecting.
 
         """
         logger.info(f"Disconnecting from {self.__id}")
@@ -52,17 +54,18 @@ class ModbusDriver(AbstractDriver):
 
         """
         try:
-            self.__modbus.write_register(address=address, value=value, slave=self.__id)
-            logger.debug(f"Writing register to {self.__id} with {value} value")
+            if type(value) is int:
+                self.__modbus.write_register(address=address, value=value, slave=self.__id)
+            else:
+                self.__modbus.write_coil(address=address, value=value, slave=self.__id)
+            logger.debug(f"Writing register to device at address {self.__id} with the value of {value}")
         except ModbusException as e:
-            logger.error(
-                f"Modbus write error at id: {self.__id}, address:{address}, {e}"
-            )
+            logger.error( f"Modbus write error at id: {self.__id}, address:{address}, {e}" )
             raise RuntimeError(e)
 
     def get_data(self):
         """
-        Generates high-quality documentation for code.
+        Generates high-quality documentation for code based on input given.
 
         """
         pass

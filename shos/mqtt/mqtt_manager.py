@@ -24,22 +24,29 @@ class MQTTManager:
     @staticmethod
     def __on_connect(client, userdata, flags, reason_code, properties):
         """
-        Prints a message when it fails to establish a connection, providing the
-        reason code as additional information.
+        Prints a message and retries the connection process if there is an error
+        connecting to the target device.
 
         Args:
-            client (object.): Twython client instance used for API requests.
+            client (object/instance of class `Client`.): client that is being
+                connected to.
                 
-                	1/ `is_failure`: A boolean value indicating whether the connection
-                attempt failed.
-            userdata (str): additional data that can be provided to the `connect()`
-                function to further customize its behavior.
-            flags (int): 3-bit status flag returned by the operating system when
-                a connection attempt fails, providing additional information about
-                the failure reason.
-            reason_code (str): error or failure cause of connecting to a remote system.
-            properties (str): configuration properties of the connection, which
-                are used to determine the error message when the connection fails.
+                		- `is_failure`: a boolean value indicating whether the connection
+                attempt failed or not
+            userdata (str): data associated with the connection attempt that failed,
+                which is used to determine the cause of failure and retry the
+                connection if necessary.
+            flags (enumeration or flag-value type, as specified in the given code
+                snippet.): 3-bit flags that provide additional information about
+                the failure, with each bit setting the corresponding flag:
+                `reason_code` (bits 0-2), `error_message` (bit 3), and `retry`
+                (bit 4).
+                
+                		- `is_failure`: Indicates whether the connection attempt was
+                unsuccessful (`True`) or successful (`False`).
+            reason_code (str): reason for failure to connect when it is set as `True`.
+            properties (str): dictionary containing the credentials of the user
+                that are needed to connect to the service.
 
         """
         if reason_code.is_failure:
@@ -47,12 +54,11 @@ class MQTTManager:
 
     def subscribe(self, topic: str):
         """
-        Is used to subscribe to a Firebase Realtime Database notification when a
-        specific event occurs.
+        Takes a string `topic`, an optional `callback` function, and an `optionalContext`
+        as input and subscribes the callback function to the given topic.
 
         Args:
-            topic (str): topic or theme for which the generated documentation will
-                be tailored.
+            topic (str): topic or subject matter of the generated documentation.
 
         """
         return

@@ -1,5 +1,5 @@
 from shos.utils.clamp import clamp
-from shos.home_assistant.device import Entity
+from shos.home_assistant.device import Entity, Hardware
 from shos.home_assistant.light.light_factory import register_light
 
 MAX_LIGHT_VALUE: int = 255
@@ -9,24 +9,34 @@ MAX_LIGHT_VALUE: int = 255
 class BinaryLight(Entity):
     __state: bool = False
 
-    def __init__(self, name: str):
+    def __init__( self, name: str, device: Hardware = None, device_class: str = None, icon: str = None, ):
         """
-        Initializes instance attributes with user-provided values and performs
-        required actions for the Device class.
+        Initializes a `Entity` object by taking in `name`, `device`, `device_class`,
+        and `icon` parameters and setting the respective attributes accordingly.
 
         Args:
-            name (str): device's name during initialization.
+            name (str): name of the entity being initialized, which is used to
+                create the appropriate file or directory path for storing configuration
+                and state information.
+            device (None): 3rd party library that will be used to interact with
+                the hardware device.
+            device_class (None): class of the device being created, which determines
+                the display icon and label shown in the entity list.
+            icon (None): 2D image file that will be used to display the entity in
+                its interface, such as a logo or icon, during the initialization
+                of the `Entity` class.
 
         """
-        Device.__init__(self, name=name)
+        Entity.__init__(self, name, device, device_class, icon)
 
     @property
     def state(self) -> bool:
         """
-        Retrieves the internal state of the object from which it was called.
+        Returns the internal state of its receiver, providing direct access to its
+        implementation-specific data structure.
 
         Returns:
-            bool: a copy of its internal state.
+            bool: the current state of the system.
 
         """
         return self.__state
@@ -43,8 +53,7 @@ class BinaryLight(Entity):
 
         """
         self.__state = state
-        __value: int = 255 if self.__state is True else 0
-        self.driver.send_data(0, __value)
+        self.driver.send_data(0, state)
 
 
 @register_light(light_type="brightness")
@@ -54,11 +63,10 @@ class BrightnessLight(BinaryLight):
     @property
     def brightness(self) -> int:
         """
-        Returns the current brightness level of the system.
+        Returns the current brightness level of the device.
 
         Returns:
-            int: a value representing the brightness level of a display, ranging
-            from 0 (completely dark) to 1 (brightly lit).
+            int: a value representing the brightness level of a display device.
 
         """
         return self.__brightness
@@ -91,10 +99,10 @@ class RGBLight(BrightnessLight):
     @property
     def red(self) -> int:
         """
-        Returns the value of the `self._red` attribute.
+        Returns the `self__red` attribute value.
 
         Returns:
-            int: a red color.
+            int: a reference to the same `red` object.
 
         """
         return self.__red
@@ -102,10 +110,10 @@ class RGBLight(BrightnessLight):
     @property
     def green(self) -> int:
         """
-        Returns `self`.
+        Returns its own object reference.
 
         Returns:
-            int: a green object instance.
+            int: a string representation of the color "Green".
 
         """
         return self.__green
@@ -113,10 +121,11 @@ class RGBLight(BrightnessLight):
     @property
     def blue(self) -> int:
         """
-        Returns its own attribute value `self._blue`.
+        Returns a reference to the same object that it was called on, maintaining
+        its state and behavior.
 
         Returns:
-            int: a reference to the `blue` attribute of its owner object.
+            int: a reference to its own `self` attribute.
 
         """
         return self.__blue
@@ -124,12 +133,13 @@ class RGBLight(BrightnessLight):
     @red.setter
     def red(self, value: int) -> None:
         """
-        Clamps a value between 0 and a maximum light value before sending it to
-        the driver through the `send_data` method.
+        Takes a value and clamps it between 0 and `MAX_LIGHT_VALUE`, then sends
+        the clamped value to the `driver` module as data.
 
         Args:
-            value (int): 8-bit value to be scaled and returned as the red component
-                of an RGB value.
+            value (int): 0-100% range of red light intensity that is clamped to
+                the maximum value of `MAX_LIGHT_VALUE` for output through the
+                `driver.send_data()` method.
 
         """
         self.__red = clamp(value, 0, MAX_LIGHT_VALUE)
@@ -138,13 +148,12 @@ class RGBLight(BrightnessLight):
     @green.setter
     def green(self, value: int) -> None:
         """
-        Clamps an input value to a range between 0 and `MAX_LIGHT_VALUE` and sends
-        the result via the `driver` module.
+        Clamps an input value between 0 and `MAX_LIGHT_VALUE`, then sends it to a
+        driver as output data.
 
         Args:
-            value (int): 8-bit RGB value that determines the green color channel
-                of the LED array, and its range is clamped to 0 to MAX_LIGHT_VALUE
-                to ensure valid LED output.
+            value (int): 0-based index of the green color component to be sent as
+                a voltage value through the driver module.
 
         """
         self.__green = clamp(value, 0, MAX_LIGHT_VALUE)
@@ -153,13 +162,13 @@ class RGBLight(BrightnessLight):
     @blue.setter
     def blue(self, value: int) -> None:
         """
-        Sets the blue value of an unknown device to a value within the range of 0
-        to MAX_LIGHT_VALUE through the `send_data()` method of a driver object.
+        Sets the value of `self.__blue` to the input value `value`, clamped to the
+        range [0, MAX_LIGHT_VALUE]. The clamped value is then sent to the driver
+        through the `send_data()` method.
 
         Args:
-            value (int): 8-bit blue component of an RGB color value to be clamped
-                within the range of 0 to MAX_LIGHT_VALUE before being sent through
-                the `driver.send_data()` method.
+            value (int): 8-bit RGB value to be lightened or darkened within the
+                specified range of 0 to MAX_LIGHT_VALUE.
 
         """
         self.__blue = clamp(value, 0, MAX_LIGHT_VALUE)
@@ -168,12 +177,10 @@ class RGBLight(BrightnessLight):
     @property
     def color(self) -> tuple[int, int, int]:
         """
-        Returns a tuple of three integers representing red, green, and blue values
-        for the given code.
+        Returns the red, green, and blue values of a given color in hexadecimal format.
 
         Returns:
-            tuple[int, int, int]: a tuple of three values representing red, green,
-            and blue components of a color.
+            tuple[int, int, int]: a tuple of three colors: red, green, and blue.
 
         """
         return self.__red, self.__green, self.__blue

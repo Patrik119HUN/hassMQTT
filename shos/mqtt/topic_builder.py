@@ -27,18 +27,25 @@ class Topic:
 
     def add(self, value: str):
         """
-        Appends a value to a list referenced by the instance variable `self.__list`.
+        Appends a value to its internal list and returns the modified object.
 
         Args:
-            value (str): element to be appended to the list maintained by the
-                instance method `append()`.
+            value (str): element to be added to the list stored in the instance
+                variable `list`.
 
         Returns:
-            instance of its own class: a reference to itself, allowing for recursive
-            calls.
+            Instance: a reference to the same instance of the `List` object.
             
-            	The returned output is an instance of the `MyClass` class, representing
-            the new object that has been added to the list.
+            	The `return` statement in the `add` function appends the input value
+            to the list stored in the instance variable `list`. This means that
+            the `list` instance is updated with each call to the `add` function.
+            
+            	The `self` parameter is used to refer to the current instance of the
+            class, allowing the `add` function to modify the instance's internal
+            state.
+            
+            	No summary is provided at the end of the response as it is not required
+            or requested.
 
         """
         self.__list.append(value)
@@ -92,10 +99,10 @@ class Topic:
 
     def __str__(self) -> str:
         """
-        Generates high-quality documentation for code based on given input.
+        Builds an instance of the code it is given.
 
         Returns:
-            str: the same as the `self.build()` method.
+            str: a string representation of the current object state."
 
         """
         return self.build()

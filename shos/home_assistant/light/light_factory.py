@@ -25,22 +25,22 @@ def register_light(light_type: str):
     """
     def decorator(fn):
         """
-        Takes a light type as input and assigns it the value of `fn`. The function
-        then returns the same value passed to it without modification.
+        Takes a light type and returns a function that is assigned to the specified
+        light type.
 
         Args:
-            fn (function.): function that is being documented, and it is used to
-                generate high-quality documentation for that function.
+            fn (function.): function to generate high-quality documentation for.
                 
-                		- `light_type`: The type of light being decorated (string)
-                		- `fn`: The function to be decorated (function)
+                		- `light_type`: The type of light to be generated, which is a string.
+                		- `return`: The function value returned by `fn`.
 
         Returns:
-            fn: a lighting fixture of the specified type.
+            fn: a function that takes no arguments and returns another function
+            without any explicit implementation.
             
-            		- `light_type`: This is an attribute of the returned object that
-            indicates the type of light it represents, with values specified in
-            the `lights` dictionary.
+            		- `light_type`: The type of light, specified as a string.
+            		- `fn`: The function to be decorated, which is assigned to the
+            `lights` variable.
 
         """
         __lights[light_type] = fn
