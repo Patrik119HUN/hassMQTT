@@ -75,5 +75,9 @@ class Topic:
             temp += x + "/"
         return temp
 
+    @property
+    def get_topic_type(self):
+        return self.__topic_type
+
     def __str__(self) -> str:
         return self.build()

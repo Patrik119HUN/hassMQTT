@@ -17,9 +17,6 @@ class Hardware:
     via_device: Optional[str] = None
 
 
-class MQTTEntitySettings:
-    qos: int
-    expire_after: int = None
 
 
 @dataclass(init=False)
