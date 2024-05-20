@@ -27,25 +27,23 @@ class Topic:
 
     def add(self, value: str):
         """
-        Appends a value to its internal list and returns the modified object.
+        Appends the given value to a list stored in an instance attribute named `__list`.
 
         Args:
-            value (str): element to be added to the list stored in the instance
-                variable `list`.
+            value (str): element to be added to the list maintained by the instance
+                of the class, and its addition is immediately returned as the same
+                instance of the class for further method calls or other actions
+                to be taken.
 
         Returns:
-            Instance: a reference to the same instance of the `List` object.
+            instance of its own class, specifically an instance of the `Addition`
+            class: a reference to itself, allowing for chaining calls to the function.
             
-            	The `return` statement in the `add` function appends the input value
-            to the list stored in the instance variable `list`. This means that
-            the `list` instance is updated with each call to the `add` function.
-            
-            	The `self` parameter is used to refer to the current instance of the
-            class, allowing the `add` function to modify the instance's internal
-            state.
-            
-            	No summary is provided at the end of the response as it is not required
-            or requested.
+            		- The returned object is a reference to the same instance of the
+            `list` class as the one on which the `add` method was called.
+            		- The `append` method adds an element to the end of the list and
+            returns the updated list.
+            		- The method does not modify the original list.
 
         """
         self.__list.append(value)
@@ -97,12 +95,23 @@ class Topic:
             temp += x + "/"
         return temp
 
-    def __str__(self) -> str:
+    @property
+    def get_topic_type(self):
         """
-        Builds an instance of the code it is given.
+        Returns the type of a topic based on its provided code.
 
         Returns:
-            str: a string representation of the current object state."
+            str: a string representing the topic type.
+
+        """
+        return self.__topic_type
+
+    def __str__(self) -> str:
+        """
+        Generates high-quality documentation for code that is passed to it.
+
+        Returns:
+            str: a string representation of the object itself.
 
         """
         return self.build()

@@ -1,8 +1,9 @@
 from paho.mqtt.client import Client, MQTTv311, MQTTMessage, ConnectFlags
 from paho.mqtt.enums import CallbackAPIVersion
 from paho.mqtt.reasoncodes import ReasonCode
-from paho.mqtt.properties import Properties
+from paho.mqtt.properties import Properties, MQTTException
 from loguru import logger
+from shos.mqtt.topic_builder import Topic, TopicType
 
 
 class MQTTManager:
@@ -42,6 +43,18 @@ class MQTTManager:
 
     @staticmethod
     def __on_message(client: Client, userdata, msg: MQTTMessage):
+        """
+        Records information in a specified log topic based on a given message payload.
+
+        Args:
+            client (Client): MQTT client that sent the message.
+            userdata (str): additional data that is provided to the `logger.debug()`
+                function beyond the `msg.payload`.
+            msg (MQTTMessage): message object that contains information about the
+                topic and payload of the message received, which is passed to the
+                `debug()` function for logging.
+
+        """
         logger.debug(f"Received {msg.payload} from {msg.topic} topic")
 
     @staticmethod
@@ -53,21 +66,24 @@ class MQTTManager:
         property: Properties,
     ):
         """
-        Monitors attempts to establish connections and logs error messages if a
-        failure occurs. Otherwise, it logs the reason code's name for information
-        purposes.
+        Checks whether it was unable to connect and, if so, retries the connection
+        process. Otherwise, it logs a message indicating the reason for failure
+        in debug mode.
 
         Args:
-            client (Client): 42connectivity reason code for connecting to the
-                42connectivity server.
-            userdata (str): additional data that can be used to pass context or
-                state information when calling the function.
-            flags (ConnectFlags): status of the connection, indicating whether it
-                was successful (`is_failure`) or not (`!is_failure`).
-            reason_code (ReasonCode): error reason caused by connecting to an
-                application server.
-            property (Properties): reason code indicating why the connection failed,
-                and its name is logged using `logger.debug()` method.
+            client (Client): Amazon API Gateway client that is used to interact
+                with the AWS Service.
+            userdata (str): additional data that is provided to the connected
+                client, as specified by the reason code returned by the connection
+                attempt.
+            flags (ConnectFlags): failure reason code of the API call, and it is
+                used to log the error message accordingly.
+            reason_code (ReasonCode): reason for the failure to connect to the
+                server, and its value is passed to the `logger` function to provide
+                additional error information.
+            property (Properties): reason for the failure to connect, and it is
+                used to log the name of the reason in debug mode when the connection
+                fails.
 
         """
         if reason_code.is_failure:
@@ -75,45 +91,57 @@ class MQTTManager:
         else:
             logger.debug(reason_code.getName())
 
-    def publish(self, topic: str, payload: str):
+    def publish(self, topic: Topic, payload: str):
         """
-        Publishes a message on a specific MQTT topic, passing in the message's
-        payload and quality of service (QOS) level.
+        Allows an object to publish data on a given MQTT topic. The function takes
+        the topic, payload, and Quality Of Service (QOS) as inputs, and based on
+        the `topic.get_topic_type`, either publishes the data or raises an exception
+        if the input is not valid.
 
         Args:
-            topic (str): Topic of the MQTT message to be published.
-            payload (str): data that will be transmitted to the MQTT broker along
-                with the publication request.
+            topic (Topic): MQTT topic that the function will send a message to or
+                publish on, with possible values including PUBLISHER and SUBSCRIBER
+                topics.
+            payload (str): data that is sent to the MQTT broker when publishing a
+                message using the specified `topic`.
 
         """
-        cuc = self.__mqtt_instance.publish(
-            topic=topic,
-            payload=payload,
-            qos=0,
-        )
+        if topic.get_topic_type is TopicType.PUBLISHER:
+            self.__mqtt_instance.publish(
+                topic=topic,
+                payload=payload,
+                qos=0,
+            )
+        else:
+            logger.error("Could not use a SUBSCRIBER topic as a publisher")
+            raise MQTTException("Could not use a SUBSCRIBER topic as a publisher")
 
-    def subscribe(self, topic: str):
+    def subscribe(self, topic: Topic):
         """
-        Subcribes to a specified MQTT topic and establishes an active connection
-        to receive messages published to that topic.
+        Determines if the given topic is a publisher or subscribe one and takes
+        the appropriate action to connect to an MQTT broker.
 
         Args:
-            topic (str): Topic of Interest for which to receive updates, as specified
-                by the client in its subscription request.
+            topic (Topic): MQTT topic for which subscription is to be performed.
 
         """
-        self.__mqtt_instance.subscribe(topic=topic)
+        if topic.get_topic_type is TopicType.SUBSCRIBER:
+            self.__mqtt_instance.subscribe(topic=topic)
+        else:
+            logger.error("Could not use a PUBLISHER topic as a subscriber")
+            raise MQTTException("Could not use a PUBLISHER topic as a subscriber")
 
     @property
     def client(self):
         """
-        Returns a reference to the `self __mqtt_instance`.
+        Generates high-quality documentation for code that is passed to it, using
+        the provided MQTT client instance.
 
         Returns:
-            instance of the `self` object: a reference to the MQTT client instance.
+            MqttClient` object: a reference to an instance of the `mosq.Client` class.
             
-            		- `mqtt_instance`: A reference to an instance of the MQTT client
-            class, which can be used to interact with the MQTT broker.
+            		- `mqtt_instance`: A reference to the MQTT instance object, which
+            can be used to send and receive messages in the MQTT broker.
 
         """
         return self.__mqtt_instance
