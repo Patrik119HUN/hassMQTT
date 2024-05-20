@@ -34,7 +34,6 @@ def create_devices(device_list: list[Device]) -> list[Any]:
     """
     devices: list[Any] = []
     for device in device_list:
-        print(device)
         dev = device_factory(**asdict(device))
         driver = driver_factory(**asdict(device))
 

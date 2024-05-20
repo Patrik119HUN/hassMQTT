@@ -28,10 +28,16 @@ class Entity:
     device: Optional[Hardware] = field(default=None, repr=False)
     device_class: Optional[str] = None
     icon: Optional[str] = None
-    unique_id: str = field(default_factory=generate_id)
+    unique_id: str = None
     driver: AbstractDriver = None
 
-    def __init__(self, name: str, device: Hardware = None, device_class: str = None, icon: str = None):
+    def __init__(
+        self,
+        name: str,
+        device: Hardware = None,
+        device_class: str = None,
+        icon: str = None,
+    ):
         """
         Initializes an instance variable `self.name`, `self.device`, `self.device_class`,
         and `self.icon`.
@@ -49,3 +55,4 @@ class Entity:
         self.device = device
         self.device_class = device_class
         self.icon = icon
+        self.unique_id = generate_id()

@@ -1,10 +1,21 @@
-from paho.mqtt.client import Client, MQTTv5
+from paho.mqtt.client import Client, MQTTv311, MQTTMessage, ConnectFlags
+from paho.mqtt.enums import CallbackAPIVersion
+from paho.mqtt.reasoncodes import ReasonCode
+from paho.mqtt.properties import Properties
+from loguru import logger
 
 
 class MQTTManager:
     __mqtt_instance: Client = None
 
-    def __init__(self, client_id: str, broker: str, port: int) -> None:
+    def __init__(
+        self,
+        client_id: str,
+        broker: str,
+        port: int,
+        username: str = None,
+        password: str = None,
+    ) -> None:
         """
         Sets up an instance of a MQTT client using `Client()` and establishes
         communication with an MQTT broker by calling `connect()`.
@@ -17,14 +28,45 @@ class MQTTManager:
                 port number where the client will connect.
 
         """
-        self.__mqtt_instance = Client(client_id=client_id, protocol=MQTTv5)
+        self.__mqtt_instance = Client(
+            callback_api_version=CallbackAPIVersion.VERSION2,
+            client_id=client_id,
+            protocol=MQTTv311,
+        )
+
+        self.__mqtt_instance.username_pw_set(username, password)
+        self.__mqtt_instance.on_connect = MQTTManager.__on_connect
+        self.__mqtt_instance.on_message = MQTTManager.__on_message
+
         self.__mqtt_instance.connect(host=broker, port=port)
-        self.__mqtt_instance.on_connect = self.__on_connect
 
     @staticmethod
-    def __on_connect(client, userdata, flags, reason_code, properties):
+    def __on_message(client: Client, userdata, msg: MQTTMessage):
+        logger.debug(f"Received {msg.payload} from {msg.topic} topic")
+
+    @staticmethod
+    def __on_connect(
+        client: Client,
+        userdata,
+        flags: ConnectFlags,
+        reason_code: ReasonCode,
+        property: Properties,
+    ):
         if reason_code.is_failure:
-            print(f"Failed to connect: {reason_code}. retrying")
+            logger.error(f"Failed to connect: {reason_code}. retrying")
+        else:
+            logger.debug(reason_code.getName())
+
+    def publish(self, topic: str, payload: str):
+        cuc = self.__mqtt_instance.publish(
+            topic=topic,
+            payload=payload,
+            qos=0,
+        )
 
     def subscribe(self, topic: str):
-        return
+        self.__mqtt_instance.subscribe(topic=topic)
+
+    @property
+    def client(self):
+        return self.__mqtt_instance
