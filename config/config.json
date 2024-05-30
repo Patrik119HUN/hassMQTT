@@ -1,6 +1,6 @@
 {
     "mqtt": {
-        "broker": "broker.hivemq.com",
+        "broker": "192.168.1.20",
         "client_id": "client",
         "port": 1883
     },
