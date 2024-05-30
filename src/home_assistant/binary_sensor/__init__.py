@@ -1,5 +1,4 @@
-from shos.home_assistant.device import Entity
-from shos.home_assistant.abstract_driver import AbstractDriver
+from src.home_assistant.device import Entity
 
 
 class BinarySensor(Entity):

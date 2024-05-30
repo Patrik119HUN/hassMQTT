@@ -1,4 +1,4 @@
-from shos.home_assistant.device import Entity
+from src.home_assistant.device import Entity
 
 __lights: dict[str, Entity] = {}
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
-from shos.home_assistant.abstract_driver import AbstractDriver
+from src.home_assistant.driver.abstract_driver import AbstractDriver
 from typing import Optional
-from shos.utils.id_generator import generate_id
+from src.utils.id_generator import generate_id
 
 
 @dataclass
@@ -15,8 +15,6 @@ class Hardware:
     connections: Optional[list[tuple]] = None
     configuration_url: Optional[str] = None
     via_device: Optional[str] = None
-
-
 
 
 @dataclass(init=False)
@@ -53,3 +51,6 @@ class Entity:
         self.device_class = device_class
         self.icon = icon
         self.unique_id = generate_id()
+
+    def accept(self, visitor):
+        pass

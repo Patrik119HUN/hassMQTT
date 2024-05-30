@@ -1,6 +1,6 @@
 from json import JSONEncoder
 
-from shos.home_assistant.light import BinaryLight, BrightnessLight, RGBLight
+from src.home_assistant.light import BinaryLight, BrightnessLight, RGBLight
 
 
 class BinaryEncoder(JSONEncoder):

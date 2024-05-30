@@ -3,7 +3,7 @@ from paho.mqtt.enums import CallbackAPIVersion
 from paho.mqtt.reasoncodes import ReasonCode
 from paho.mqtt.properties import Properties, MQTTException
 from loguru import logger
-from shos.mqtt.topic_builder import Topic, TopicType
+from src.mqtt.topic_builder import Topic, TopicType
 
 
 class MQTTManager:
@@ -40,6 +40,9 @@ class MQTTManager:
         self.__mqtt_instance.on_message = MQTTManager.__on_message
 
         self.__mqtt_instance.connect(host=broker, port=port)
+        logger.info(
+            f"MQTT manager connected to:{broker}:{port} with username:{username}"
+        )
 
     @staticmethod
     def __on_message(client: Client, userdata, msg: MQTTMessage):
@@ -61,7 +64,7 @@ class MQTTManager:
     def publish(self, topic: Topic, payload: str):
         if topic.get_topic_type is TopicType.PUBLISHER:
             self.__mqtt_instance.publish(
-                topic=topic,
+                topic=topic.build(),
                 payload=payload,
                 qos=0,
             )
@@ -71,7 +74,9 @@ class MQTTManager:
 
     def subscribe(self, topic: Topic):
         if topic.get_topic_type is TopicType.SUBSCRIBER:
-            self.__mqtt_instance.subscribe(topic=topic)
+            topic_str = topic.build()
+            self.__mqtt_instance.subscribe(topic=topic_str)
+            logger.info(f"Client subscribed to:{topic_str}")
         else:
             logger.error("Could not use a PUBLISHER topic as a subscriber")
             raise MQTTException("Could not use a PUBLISHER topic as a subscriber")

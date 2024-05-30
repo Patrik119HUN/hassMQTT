@@ -2,7 +2,7 @@ from loguru import logger
 
 from pymodbus import ModbusException
 from pymodbus.client.base import ModbusBaseSyncClient
-from shos.home_assistant.abstract_driver import AbstractDriver
+from src.home_assistant.driver.abstract_driver import AbstractDriver
 
 
 class ModbusDriver(AbstractDriver):
@@ -48,5 +48,9 @@ class ModbusDriver(AbstractDriver):
             logger.error( f"Modbus write error at id: {self.__id}, address:{address}, {e}" )
             raise RuntimeError(e)
 
-    def get_data(self):
+    def get_data(self, address: int):
+        try:
+            self.__modbus.read_holding_registers()
+        except ModbusException as e:
+            logger.error(e)
         pass

@@ -1,6 +1,6 @@
-from shos.utils.clamp import clamp
-from shos.home_assistant.device import Entity, Hardware
-from shos.home_assistant.light.light_factory import register_light
+from src.utils.clamp import clamp
+from src.home_assistant.device import Entity, Hardware
+from src.home_assistant.light.light_factory import register_light
 
 MAX_LIGHT_VALUE: int = 255
 
@@ -9,7 +9,13 @@ MAX_LIGHT_VALUE: int = 255
 class BinaryLight(Entity):
     __state: bool = False
 
-    def __init__( self, name: str, device: Hardware = None, device_class: str = None, icon: str = None, ):
+    def __init__(
+        self,
+        name: str,
+        device: Hardware = None,
+        device_class: str = None,
+        icon: str = None,
+    ):
         Entity.__init__(self, name, device, device_class, icon)
 
     @property
@@ -29,6 +35,9 @@ class BinaryLight(Entity):
         """
         self.__state = state
         self.driver.send_data(0, state)
+
+    def accept(self, visitor):
+        visitor.binary_light(self)
 
 
 @register_light(light_type="brightness")
@@ -56,6 +65,9 @@ class BrightnessLight(BinaryLight):
         self.__brightness = clamp(brightness, 0, MAX_LIGHT_VALUE)
         self.driver.send_data(1, self.__brightness)
         self.state = True if self.__brightness != 0 else False
+
+    def accept(self, visitor):
+        visitor.brightness_light(self)
 
 
 @register_light(light_type="rgb")
@@ -104,13 +116,16 @@ class RGBLight(BrightnessLight):
         Args:
             colors (enumeration (or 'tag').): 3 RGB colors that will be used to
                 define the color of the component.
-                
-                		- `red`: The `red` property has the value `'red'`.
-                		- `green`: The `green` property has the value `'green'`.
-                		- `blue`: The `blue` property has the value `'blue'`.
+
+                                - `red`: The `red` property has the value `'red'`.
+                                - `green`: The `green` property has the value `'green'`.
+                                - `blue`: The `blue` property has the value `'blue'`.
 
         """
         red, green, blue = colors
         self.red = red
         self.green = green
         self.blue = blue
+
+    def accept(self, visitor):
+        visitor.rgb_light(self)
