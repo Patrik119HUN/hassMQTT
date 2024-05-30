@@ -29,6 +29,10 @@ class Topic:
         self.__list.append(value)
         return self
 
+    def pop(self):
+        self.__list.pop()
+        return self
+
     def add_single_level(self):
         """
         Updates a list with a new string by concatenating it with the previous
@@ -73,6 +77,7 @@ class Topic:
         temp: str = ""
         for x in self.__list:
             temp += x + "/"
+        temp = temp[:-1]
         return temp
 
     @property
