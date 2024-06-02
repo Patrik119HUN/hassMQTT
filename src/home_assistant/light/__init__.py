@@ -15,8 +15,9 @@ class BinaryLight(Entity):
         device: Hardware = None,
         device_class: str = None,
         icon: str = None,
+        unique_id: str = None,
     ):
-        Entity.__init__(self, name, device, device_class, icon)
+        Entity.__init__(self, name, device, device_class, icon, unique_id)
 
     @property
     def state(self) -> bool:
