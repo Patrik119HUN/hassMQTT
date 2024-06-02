@@ -1,4 +1,5 @@
 from src.home_assistant.mqtt_packet.discovery.base_packet import MQTTDiscoveryPacket
+from src.mqtt.topic_builder import Topic
 
 
 class BinaryLightMQTTDiscoveryPacket(MQTTDiscoveryPacket):
@@ -7,10 +8,10 @@ class BinaryLightMQTTDiscoveryPacket(MQTTDiscoveryPacket):
 
 
 class BrightnessLightMQTTDiscoveryPacket(BinaryLightMQTTDiscoveryPacket):
-    brightness_command_topic: str
-    brightness_state_topic: str
+    brightness_command_topic: Topic
+    brightness_state_topic: Topic
 
 
 class RGBLightMQTTDiscoveryPacket(BrightnessLightMQTTDiscoveryPacket):
-    rgb_command_topic: str
-    rgb_state_topic: str
+    rgb_command_topic: Topic
+    rgb_state_topic: Topic

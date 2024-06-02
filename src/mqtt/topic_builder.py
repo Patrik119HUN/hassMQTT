@@ -1,4 +1,7 @@
 from enum import Enum, auto
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import CoreSchema, core_schema
+from typing import Any
 
 
 class TopicType(Enum):
@@ -86,3 +89,13 @@ class Topic:
 
     def __str__(self) -> str:
         return self.build()
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> CoreSchema:
+        return core_schema.json_or_python_schema(
+            json_schema=core_schema.str_schema(),
+            python_schema=core_schema.is_instance_schema(Topic),
+            serialization=core_schema.plain_serializer_function_ser_schema(lambda c: c.build()),
+        )
