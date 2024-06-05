@@ -3,11 +3,20 @@ from paho.mqtt.enums import CallbackAPIVersion
 from paho.mqtt.reasoncodes import ReasonCode
 from paho.mqtt.properties import Properties, MQTTException
 from loguru import logger
-from src.mqtt.topic_builder import Topic, TopicType
+from src.mqtt.topic_builder import Topic, TopicType, StringToTopic
+from typing import Callable, List, Dict
+from abc import ABC, abstractmethod
+
+
+class TopicObserver(ABC):
+    @abstractmethod
+    def update(self, topic: Topic, payload: bytes):
+        pass
 
 
 class MQTTManager:
     __mqtt_instance: Client = None
+    __subscribers: Dict[str, List[TopicObserver]] = {}
 
     def __init__(
         self,
@@ -37,16 +46,18 @@ class MQTTManager:
 
         self.__mqtt_instance.username_pw_set(username, password)
         self.__mqtt_instance.on_connect = MQTTManager.__on_connect
-        self.__mqtt_instance.on_message = MQTTManager.__on_message
+        self.__mqtt_instance.on_message = self.__on_message
 
         self.__mqtt_instance.connect(host=broker, port=port)
         logger.info(
             f"MQTT manager connected to:{broker}:{port} with username:{username}"
         )
 
-    @staticmethod
-    def __on_message(client: Client, userdata, msg: MQTTMessage):
-        logger.debug(f"Received {msg.payload} from {msg.topic} topic")
+    def __on_message(self, client: Client, userdata, msg: MQTTMessage):
+        message = msg.payload.decode("utf-8")
+        topic = StringToTopic(TopicType.SUBSCRIBER, msg.topic).build()
+        self.notify(topic, msg.payload)
+        logger.debug(f"Received {message} from {msg.topic} topic")
 
     @staticmethod
     def __on_connect(
@@ -61,7 +72,7 @@ class MQTTManager:
         else:
             logger.debug(reason_code.getName())
 
-    def publish(self, topic: Topic, payload: str):
+    def publish(self, topic: Topic, payload: str | bytes | bytearray | float | None):
         if topic.get_topic_type is TopicType.PUBLISHER:
             self.__mqtt_instance.publish(
                 topic=topic.build(),
@@ -74,12 +85,32 @@ class MQTTManager:
 
     def subscribe(self, topic: Topic):
         if topic.get_topic_type is TopicType.SUBSCRIBER:
-            topic_str = topic.build()
-            self.__mqtt_instance.subscribe(topic=topic_str)
-            logger.info(f"Client subscribed to:{topic_str}")
+            self.__mqtt_instance.subscribe(topic=topic.build())
+            logger.info(f"Client subscribed to:{topic.build()}")
         else:
             logger.error("Could not use a PUBLISHER topic as a subscriber")
             raise MQTTException("Could not use a PUBLISHER topic as a subscriber")
+
+    def add_subscriber(self, topic: Topic, observer: TopicObserver):
+        logger.info(f"Client subscribed to:{topic.build()}")
+        if topic.build() not in self.__subscribers:
+            self.__subscribers[topic.build()] = []
+        self.__subscribers[topic.build()].append(observer)
+
+    def remove_observ(self, topic: Topic, observer: TopicObserver):
+        if topic in self.__subscribers:
+            self.__subscribers[topic.build()].remove(observer)
+            if not self.__subscribers[topic.build()]:
+                del self.__subscribers[topic.build()]
+
+    def notify(self, topic: Topic, payload: bytes):
+        if topic.build() in self.__subscribers:
+            for observer in self.__subscribers[topic.build()]:
+                logger.info(f"Notifying observer:{topic.build()}")
+                observer.update(topic, payload)
+
+    def loop(self):
+        self.__mqtt_instance.loop_forever()
 
     @property
     def client(self):
