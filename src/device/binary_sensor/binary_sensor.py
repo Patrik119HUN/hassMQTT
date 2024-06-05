@@ -1,4 +1,4 @@
-from src.home_assistant.device import Entity
+from src.device.entity import Entity
 
 
 class BinarySensor(Entity):
