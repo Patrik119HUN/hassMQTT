@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from src.home_assistant.device import Hardware
+from src.device.entity import Hardware
 from src.mqtt.topic_builder import Topic
 
 

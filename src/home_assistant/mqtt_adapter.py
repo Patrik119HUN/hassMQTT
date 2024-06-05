@@ -1,8 +1,8 @@
-from src.home_assistant.device import Entity
+from src.device.entity import Entity
 from dataclasses import dataclass
 from src.mqtt.topic_builder import Topic, TopicType
-from src.home_assistant.light import BinaryLight
-from src.home_assistant.binary_sensor import BinarySensor
+from src.device.light import BinaryLight
+from src.device.binary_sensor import BinarySensor
 from src.home_assistant.mqtt_packet.discovery.visitor import MQTTVisitor
 from src.home_assistant.mqtt_packet.discovery.base_packet import MQTTDiscoveryPacket
 from typing import Tuple
@@ -38,10 +38,6 @@ class DeviceToMQTTAdatper:
         self.__device.accept(visitor)
         packet = visitor.get()
         topic = (
-            Topic(TopicType.PUBLISHER)
-            .add(DISCOVERY_TOPIC)
-            .add(self.__type)
-            .add(self.__device.unique_id)
-            .add("config")
+            Topic(TopicType.PUBLISHER).add(DISCOVERY_TOPIC).add(self.__type).add(self.__device.unique_id).add("config")
         )
         return topic, packet

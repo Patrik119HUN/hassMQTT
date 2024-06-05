@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from src.home_assistant.light import BinaryLight, BrightnessLight, RGBLight
+from src.device.light import BinaryLight, BrightnessLight, RGBLight
 from src.home_assistant.mqtt_packet.discovery.light import *
-from src.home_assistant.topic_factory import HATopicFactory
+from src.home_assistant.topic_factory import HATopicFactory, TopicType
 
 BASE_TOPIC = "shos"
 
@@ -22,9 +22,13 @@ class MQTTVisitor:
         self.__packet = BinaryLightMQTTDiscoveryPacket(
             name=light.name,
             unique_id=light.unique_id,
-            state_topic=base_topic.create("state"),
             command_topic=base_topic.create("set"),
-            availability_topic=base_topic.create("availability"),
+            availability_topic=HATopicFactory(self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER).create(
+                "availability"
+            ),
+            state_topic=HATopicFactory(self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER).create(
+                "state"
+            ),
         )
 
     def brightness_light(self, light: BrightnessLight):
