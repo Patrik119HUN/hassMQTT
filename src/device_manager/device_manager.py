@@ -1,17 +1,16 @@
-from src.home_assistant.binary_sensor import BinarySensor
-from src.home_assistant.light.driver import ModbusDriver
-from src.home_assistant.light.light_factory import get_light
+from src.home_assistant.driver.modbus_driver import ModbusDriver
+from src.device.device_factory import DeviceFactory
 from pymodbus.client.base import ModbusBaseSyncClient
-from loguru import logger
-from src.home_assistant.device import Entity
+from src.device.entity import Entity
 from src.modbus_controller import modbus_controller
-from src.device_manager.device_dao_interface import DeviceDAOInterface
+from src.repository import EntityRepository, HardwareRepository
 
 
 class DeviceManager:
     __modbus_manager: ModbusBaseSyncClient = None
     __device_list: list[Entity] = []
     __device_dao: DeviceDAOInterface = None
+    __device_factory: DeviceFactory
 
     def __init__(
         self,
@@ -20,28 +19,16 @@ class DeviceManager:
     ):
         self.__modbus_manager = modbus_driver
         self.__device_dao = device_dao
+        self.__device_factory = DeviceFactory()
 
     def create_device(
         self, unique_id: str, name: str, hardware_type: str, device_type: str, **kwargs
     ) -> Entity:
-        dev = DeviceManager.device_factory(device_type, name, unique_id, **kwargs)
+        dev = self.__device_factory.get_device(device_type, name, unique_id, **kwargs)
         driver = self.driver_factory(hardware_type, address=kwargs["device_id"])
 
         dev.driver = driver
         return dev
-
-    @staticmethod
-    def device_factory(device_type: str, name: str, unique_id: str, **kwargs) -> Entity:
-        created_dev = None
-        match device_type:
-            case "light":
-                created_dev = get_light(kwargs["color_mode"])(name, unique_id=unique_id)
-            case "binary_sensor":
-                created_dev = BinarySensor(name)
-            case "alarm":
-                raise NotImplemented("Alarm not implemented yet")
-        logger.debug(f"created an {created_dev.__class__.__name__}")
-        return created_dev
 
     def driver_factory(self, hardware_type: str, address: int):
         created_driver = None
