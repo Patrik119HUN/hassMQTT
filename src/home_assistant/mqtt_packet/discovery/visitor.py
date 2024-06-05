@@ -1,21 +1,23 @@
 from pydantic import BaseModel
-from src.home_assistant.light import BinaryLight, BrightnessLight, RGBLight
+from src.device.light import BinaryLight, BrightnessLight, RGBLight
 from src.home_assistant.mqtt_packet.discovery.light import *
-from src.home_assistant.topic_factory import HATopicFactory
+from src.home_assistant.topic_factory import HATopicFactory, TopicType
 
 BASE_TOPIC = "shos"
 
 
 def json(thing: BaseModel) -> str:
     """
-    Returns a JSON representation of the given object model in less than 50 words
+    "thing.model_dump_json(exclude_unset=True, exclude_none=True, indent=2)"
+    generates high-quality documentation for given code by producing a JSON
+    representation of the code's model without unset or none fields and with
+    indentation level of 2.
 
     Args:
-        thing (BaseModel): code to be documented, and the `model_dump_json()`
-            function generates high-quality documentation for it.
+        thing (BaseModel): Python object that contains data to be serialized as JSON.
 
     Returns:
-        str: a JSON-formatted string containing the model dump of the provided input.
+        str: a serialized representation of the `thing` object.
 
     """
     return thing.model_dump_json(exclude_unset=True, exclude_none=True, indent=2)
@@ -27,43 +29,46 @@ class MQTTVisitor:
 
     def __init__(self, base_topic: str = BASE_TOPIC):
         """
-        Sets the `base_topic` attribute of a Python object, indicating the topic
-        that serves as the base or starting point for the object's documentation.
+        Sets a code generator's topical variable `self._base_topic`.
 
         Args:
-            base_topic (BASE_TOPIC): top-level topic or category for which
-                high-quality documentation is to be generated.
+            base_topic (BASE_TOPIC): topic that the function will operate on.
 
         """
         self.__base_topic = base_topic
 
     def binary_light(self, light: BinaryLight):
         """
-        Creates a Binary Light MQTT discovery packet with a name, unique ID, and
-        three topic names: "state", "set", and "availability".
+        Creates a Binary Light MQTT Discovery Packet, including command and state
+        topics, based on input `light` data.
 
         Args:
-            light (BinaryLight): Light object to create a packet for in the `BinaryLightMQTTDiscoveryPacket`.
+            light (BinaryLight): device that the function is generating documentation
+                for, providing its name and unique ID.
 
         """
         base_topic = HATopicFactory(self.__base_topic, "light", light.unique_id)
         self.__packet = BinaryLightMQTTDiscoveryPacket(
             name=light.name,
             unique_id=light.unique_id,
-            state_topic=base_topic.create("state"),
             command_topic=base_topic.create("set"),
-            availability_topic=base_topic.create("availability"),
+            availability_topic=HATopicFactory(self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER).create(
+                "availability"
+            ),
+            state_topic=HATopicFactory(self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER).create(
+                "state"
+            ),
         )
 
     def brightness_light(self, light: BrightnessLight):
         """
-        Creates a Brightness Light MQTT Discovery Packet based on a given light
-        object, specifying topics for state, command, availability, and brightness
-        control and state.
+        Generates a BrightnessLightMQTTDiscoveryPacket with various MQTT topics
+        for a light device based on its given information, such as name, unique
+        ID, and brightness command and state topics.
 
         Args:
-            light (BrightnessLight): object to generate high-quality documentation
-                for, providing its name and unique ID.
+            light (BrightnessLight): instance of a `light` class and provides the
+                unique ID of the light to be configured.
 
         """
         base_topic = HATopicFactory(self.__base_topic, "light", light.unique_id)
@@ -79,12 +84,13 @@ class MQTTVisitor:
 
     def rgb_light(self, light: RGBLight):
         """
-        Defines a MQTT discovery packet for an RGB light, defining various topics
-        and commands for state, control, and availability.
+        Creates a packet for RGB light device based on its provided name and unique
+        ID, specifying the topic names for its state, command, availability,
+        brightness set and state, and RGB state and set topics.
 
         Args:
-            light (RGBLight): `Light` object that provides the necessary information
-                to generate high-quality documentation for the code.
+            light (RGBLight): object being discovered, providing its name and
+                unique ID for use in generating the discovery packet.
 
         """
         base_topic = HATopicFactory(self.__base_topic, "light", light.unique_id)
@@ -102,16 +108,16 @@ class MQTTVisitor:
 
     def get(self):
         """
-        Returns a copy of its receiver (i.e., itself) as a `Packet` object.
+        Retrieves the internal packet representation of the class instance provided
+        as its argument.
 
         Returns:
-            Packet: a packet object instance.
+            Packet: a packet object.
             
-            		- `self`: A reference to the `Packet` object, indicating that the
-            method returned a reference to the same object for further manipulation
-            or methods call.
-            		- `__packet`: The actual packet data as a bytestring, which can be
-            further processed or analyzed.
+            		- `self`: This is the current object instance being worked on, which
+            contains all the necessary information to generate high-quality documentation.
+            		- `__packet`: The output of the `get` function, which is a packet
+            of documentation that can be used to generate code documentation.
 
         """
         return self.__packet

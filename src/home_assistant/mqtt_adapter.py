@@ -1,8 +1,8 @@
-from src.home_assistant.device import Entity
+from src.device.entity import Entity
 from dataclasses import dataclass
 from src.mqtt.topic_builder import Topic, TopicType
-from src.home_assistant.light import BinaryLight
-from src.home_assistant.binary_sensor import BinarySensor
+from src.device.light import BinaryLight
+from src.device.binary_sensor import BinarySensor
 from src.home_assistant.mqtt_packet.discovery.visitor import MQTTVisitor
 from src.home_assistant.mqtt_packet.discovery.base_packet import MQTTDiscoveryPacket
 from typing import Tuple
@@ -23,11 +23,12 @@ class DeviceToMQTTAdatper:
 
     def __init__(self, device: Entity) -> None:
         """
-        Initializes class instance variables `device` and `type`.
+        Sets instance variables `device` and `type` based on input parameter `device`.
 
         Args:
-            device (Entity): 3D printer or other hardware component associated
-                with the code being generated.
+            device (Entity): 3D graphics hardware on which the scene is to be
+                rendered, and its value is used to determine the appropriate
+                rendering settings for the scene.
 
         """
         self.__device = device
@@ -35,13 +36,17 @@ class DeviceToMQTTAdatper:
 
     def get_component(self):
         """
-        Iterates through the class variables defined on a Python class, and for
-        each variable returns its corresponding string value if the variable is
-        an instance of a specified type.
+        Maps each item in the dictionary `self.__class_to_str` to its corresponding
+        string value, and then checks if the device object is of that type. If it
+        is, the function returns the associated string value.
 
         Returns:
-            str: a string representing the fully qualified name of the component
-            instance being evaluated.
+            instance of `type: the string representation of the component class
+            associated with the provided device.
+            
+            	For each key-value pair in the `self.__class_to_str` dictionary, if
+            the value is an instance of the specified class, the return value is
+            that class.
 
         """
         for x, y in self.__class_to_str.items():
@@ -50,29 +55,25 @@ class DeviceToMQTTAdatper:
 
     def generate_discrovery_config_message(self):
         """
-        Creates a discovery configuration message for code that is passed as input.
+        Generates high-quality documentation for code
 
         """
         pass
 
     def get_discovery(self) -> Tuple[Topic, MQTTDiscoveryPacket]:
         """
-        Creates a Topic object representing a MQTT subscription to a discovery
-        endpoint and returns it along with an MQTT packet containing the device configuration.
+        Is called by an instance of `MQTTVisitor` and returns a tuple containing
+        the MQTT topic and message after processing a device acceptance.
 
         Returns:
-            Tuple[Topic, MQTTDiscoveryPacket]: a tuple containing the MQTT topic
-            and a payload.
+            Tuple[Topic, MQTTDiscoveryPacket]: a topic and a data packet containing
+            information about a device.
 
         """
         visitor = MQTTVisitor()
         self.__device.accept(visitor)
         packet = visitor.get()
         topic = (
-            Topic(TopicType.PUBLISHER)
-            .add(DISCOVERY_TOPIC)
-            .add(self.__type)
-            .add(self.__device.unique_id)
-            .add("config")
+            Topic(TopicType.PUBLISHER).add(DISCOVERY_TOPIC).add(self.__type).add(self.__device.unique_id).add("config")
         )
         return topic, packet
