@@ -2,20 +2,7 @@ from dataclasses import dataclass, field
 from src.home_assistant.driver.abstract_driver import AbstractDriver
 from typing import Optional
 from src.utils.id_generator import generate_id
-from src.modbus_controller import modbus_controller
-
-
-@dataclass
-class Hardware:
-    name: str
-    model: Optional[str] = None
-    manufacturer: Optional[str] = None
-    sw_version: Optional[str] = None
-    hw_version: Optional[str] = None
-    identifiers: Optional[list[str]] = None
-    connections: Optional[list[tuple]] = None
-    configuration_url: Optional[str] = None
-    via_device: Optional[str] = None
+from src.device.hardware import Hardware
 
 
 @dataclass(init=False)
