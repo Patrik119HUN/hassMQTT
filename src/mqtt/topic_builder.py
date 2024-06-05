@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
-from typing import Any
+from typing import Any, List
 
 
 class TopicType(Enum):
@@ -90,6 +90,9 @@ class Topic:
     def __str__(self) -> str:
         return self.build()
 
+    def __eq__(self, other):
+        return str(self) == str(other)
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
@@ -97,5 +100,20 @@ class Topic:
         return core_schema.json_or_python_schema(
             json_schema=core_schema.str_schema(),
             python_schema=core_schema.is_instance_schema(Topic),
-            serialization=core_schema.plain_serializer_function_ser_schema(lambda c: c.build()),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda c: c.build()
+            ),
         )
+
+
+class StringToTopic:
+    __topic: Topic
+
+    def __init__(self, topic_type: TopicType, value: str):
+        str_list: List[str] = value.split("/")
+        self.__topic = Topic(topic_type)
+        for x in str_list:
+            self.__topic.add(x)
+
+    def build(self) -> Topic:
+        return self.__topic
