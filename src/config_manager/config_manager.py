@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 from pathlib import Path
+from dotenv import dotenv_values
 
 
 class ConfigManager:
@@ -12,6 +13,10 @@ class ConfigManager:
 
     def __getitem__(self, item):
         return self.__config[item]
+
+    def load_env(self, name: str, file_name: str | Path = None):
+        values = {k.lower(): v for k, v in dotenv_values(file_name).items()}
+        self.__config[name].update(values)
 
     def load_config(self, file_name: str | Path = None) -> dict[str, Any]:
         """
