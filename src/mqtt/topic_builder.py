@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
-from typing import Any
+from typing import Any, List
 
 
 class TopicType(Enum):
@@ -29,31 +29,15 @@ class Topic:
         pass
 
     def add(self, value: str):
-        """
-        Adds the given value to a list referred to by the instance variable `__list`.
-        It returns the modified instance, allowing for chaining of method calls.
-
-        Args:
-            value (str): value to be added to the list returned by the function.
-
-        Returns:
-            list: a reference to the same object instance.
-
-        """
         self.__list.append(value)
         return self
 
     def pop(self):
         """
-        Removes the last element from a list.
+        Removed the last item from a list and returns the modified list.
 
         Returns:
-            instance of `Node: the popped element from the list.
-            
-            		- If no arguments are passed to `pop`, it removes the last item from
-            the list and returns it.
-            		- If one or more arguments are passed, it removes and returns a
-            single item from the list based on the provided index(es).
+            list: a reference to the original object.
 
         """
         self.__list.pop()
@@ -109,18 +93,19 @@ class Topic:
     @property
     def get_topic_type(self):
         """
-        Returns a string representing the topic type for which it was designed
-        based on its internal data.
+        Returns a string representing the topic type of the given code.
 
         Returns:
-            str: a string representation of the topic type."
+            str: a string representing the type of topic being described.
 
         """
         return self.__topic_type
 
     def __str__(self) -> str:
         """
-        Generates high-quality documentation for code based on the given code.
+        Builds a string representation of its instance by returning `self.build()`.
+        It returns a built string object representing the instance's data in a
+        specific format without modifying its original value.
 
         Returns:
             str: a string representation of the code object.
@@ -128,40 +113,94 @@ class Topic:
         """
         return self.build()
 
+    def __eq__(self, other):
+        """
+        Compares two objects of the same class by returning `True` if their strings
+        are equal, and `False` otherwise.
+
+        Args:
+            other (str): 2nd argument used for comparing strings, which is optional
+                but provides additional context for evaluating equality between
+                two string values.
+
+        Returns:
+            str: a boolean value indicating whether the object and the other
+            argument are equal.
+
+        """
+        return str(self) == str(other)
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> CoreSchema:
         """
-        Generates high-quality documentation for given code by providing a Pydantic
-        schema based on the code's structure and methods, using the `json_schema`
-        and `python_schema` arguments as inputs.
+        Generates high-quality documentation for code given to it by creating JSON
+        and Python schema files based on the `core_schema`.
 
         Args:
-            cls (instance of Topic class as indicated by its serialization method,
-                which returns plain serializer function schema.): Python class of
-                the serialized object.
+            cls (instance of `Topic`.): type of Python object that will be serialized
+                and deserialized by the `core_schema.plain_serializer_function_ser_schema()`
+                function.
                 
-                		- `json_schema`: A JSON schema dictionary defining the structure
-                of the data in `cls`.
-                		- `python_schema`: An instance of `pydantic.types.PythonType`
-                representing the Python class of `cls`.
-                		- `serialization`: A function that serializes the contents of
-                `cls` to a string using the `plain_serializer_function_ser_schema`.
+                		- `json_schema`: A JSON schema defining the structure of the
+                deserialized input.
+                		- `python_schema`: An instance of the `IsInstanceSchema` class,
+                which specifies the Python class of the deserialized input.
+                		- `serialization`: A function that serializes the input to a
+                JSON-compatible form, using the `plain_serializer_function` schema.
                 
-                	Note that the input `cls` may or may not need to be destructed
-                depending on its structure and the requirements of the function.
-            source_type (Any): type of data to be validated, specifically whether
-                it is JSON or Python schema.
-            handler (GetCoreSchemaHandler): Topic serialization method for generating
-                high-quality documentation.
+                	The input `cls` is destructured if appropriate, meaning its
+                properties are explained in detail below. If `cls` is not destructured,
+                it means that all of its properties have been explicitedly assigned
+                and do not need further explanation.
+            source_type (Any): type of schema that is being used to generate the
+                documentation, specifically whether it is a JSON or Python schema.
+            handler (GetCoreSchemaHandler): schema for the Python object that will
+                be serialized, specifically an instance of the `Topic` class.
 
         Returns:
-            CoreSchema: a Pydantic schema represented as a Python object.
+            CoreSchema: a Pydantic core schema dictionary representation of the
+            Topic class.
 
         """
         return core_schema.json_or_python_schema(
             json_schema=core_schema.str_schema(),
             python_schema=core_schema.is_instance_schema(Topic),
-            serialization=core_schema.plain_serializer_function_ser_schema(lambda c: c.build()),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda c: c.build()
+            ),
         )
+
+
+class StringToTopic:
+    __topic: Topic
+
+    def __init__(self, topic_type: TopicType, value: str):
+        """
+        Initializes an instance of `Topic` with a given `topic_type`. It then
+        splits the input `value` into a list of strings and passes each string to
+        the `add()` method of the topic instance.
+
+        Args:
+            topic_type (TopicType): type of topic that the `self.__topic` variable
+                will represent after the method call.
+            value (str): code documentation to be generated, which is split into
+                a list of strings (`str_list`) and used to initialize a `Topic`
+                object representing the topic type provided as input.
+
+        """
+        str_list: List[str] = value.split("/")
+        self.__topic = Topic(topic_type)
+        for x in str_list:
+            self.__topic.add(x)
+
+    def build(self) -> Topic:
+        """
+        Returns a reference to the current class instance's internal `self`.
+
+        Returns:
+            Topic: a string representing the documentation for the code provided.
+
+        """
+        return self.__topic
