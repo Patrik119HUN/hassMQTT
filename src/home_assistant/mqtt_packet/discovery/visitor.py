@@ -23,12 +23,12 @@ class MQTTVisitor:
             name=light.name,
             unique_id=light.unique_id,
             command_topic=base_topic.create("set"),
-            availability_topic=HATopicFactory(self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER).create(
-                "availability"
-            ),
-            state_topic=HATopicFactory(self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER).create(
-                "state"
-            ),
+            availability_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("availability"),
+            state_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("state"),
         )
 
     def brightness_light(self, light: BrightnessLight):
@@ -36,11 +36,17 @@ class MQTTVisitor:
         self.__packet = BrightnessLightMQTTDiscoveryPacket(
             name=light.name,
             unique_id=light.unique_id,
-            state_topic=base_topic.create("state"),
             command_topic=base_topic.create("command"),
-            availability_topic=base_topic.create("availability"),
+            availability_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("availability"),
+            state_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("state"),
             brightness_command_topic=base_topic.create("brightness", "set"),
-            brightness_state_topic=base_topic.create("brightness", "state"),
+            brightness_state_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("brightness", "state"),
         )
 
     def rgb_light(self, light: RGBLight):
@@ -48,12 +54,20 @@ class MQTTVisitor:
         self.__packet = RGBLightMQTTDiscoveryPacket(
             name=light.name,
             unique_id=light.unique_id,
-            state_topic=base_topic.create("state"),
             command_topic=base_topic.create("command"),
-            availability_topic=base_topic.create("availability"),
+            availability_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("availability"),
+            state_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("state"),
             brightness_command_topic=base_topic.create("brightness", "set"),
-            brightness_state_topic=base_topic.create("brightness", "state"),
-            rgb_state_topic=base_topic.create("rgb", "state"),
+            brightness_state_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("brightness", "state"),
+            rgb_state_topic=HATopicFactory(
+                self.__base_topic, "light", light.unique_id, TopicType.PUBLISHER
+            ).create("rgb", "state"),
             rgb_command_topic=base_topic.create("rgb", "set"),
         )
 
