@@ -1,7 +1,6 @@
 from src.device.light.brightness_light import BrightnessLight
 from src.utils.clamp import clamp
 
-
 MAX_LIGHT_VALUE: int = 255
 
 

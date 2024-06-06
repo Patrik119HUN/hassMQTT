@@ -1,7 +1,6 @@
 from src.device.light.binary_light import BinaryLight
 from src.utils.clamp import clamp
 
-
 MAX_LIGHT_VALUE: int = 255
 
 
