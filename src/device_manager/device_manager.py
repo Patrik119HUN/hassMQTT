@@ -3,41 +3,34 @@ from src.device.device_factory import DeviceFactory
 from pymodbus.client.base import ModbusBaseSyncClient
 from src.device.entity import Entity
 from src.modbus_controller import modbus_controller
-from src.repository import EntityRepository, HardwareRepository
+from src.device.hardware import Hardware
+from src.repository import EntityRepository
+from src.config_manager import config_manager
 
 
 class DeviceManager:
-    __modbus_manager: ModbusBaseSyncClient = None
     __device_list: list[Entity] = []
-    __device_dao: DeviceDAOInterface = None
     __device_factory: DeviceFactory
 
-    def __init__(
-        self,
-        modbus_driver=modbus_controller.instance,
-        device_dao: DeviceDAOInterface = None,
-    ):
-        self.__modbus_manager = modbus_driver
-        self.__device_dao = device_dao
-        self.__device_factory = DeviceFactory()
+    def __init__(self, modbus_driver=modbus_controller.instance):
+        self.__device_factory = DeviceFactory(modbus_driver)
+        for e in EntityRepository(config_manager["database"]).list():
+            dev = self.__device_factory.get_device(
+                e.entity_type, e.name, e.unique_id, e.hardware, e.icon
+            )
+            self.__device_list.append(dev)
 
-    def create_device(
-        self, unique_id: str, name: str, hardware_type: str, device_type: str, **kwargs
-    ) -> Entity:
-        dev = self.__device_factory.get_device(device_type, name, unique_id, **kwargs)
-        driver = self.driver_factory(hardware_type, address=kwargs["device_id"])
+    def list(self) -> list[Entity]:
+        return self.__device_list
 
-        dev.driver = driver
-        return dev
+    def add(self, entity: Entity):
+        self.__device_list.append(entity)
 
-    def driver_factory(self, hardware_type: str, address: int):
-        created_driver = None
-        match hardware_type:
-            case "modbus":
-                created_driver = ModbusDriver(self.__modbus_manager)
-                created_driver.connect(id=address)
-            case "can":
-                raise NotImplemented("CAN driver implemented yet")
-            case "hat":
-                raise NotImplemented("Built in driver implemented yet")
-        return created_driver
+    def remove(self, unique_id: str):
+        entity = self.get(unique_id)
+        self.__device_list.remove(entity)
+
+    def get(self, unique_id: str) -> Entity:
+        for entity in self.__device_list:
+            if entity.unique_id == unique_id:
+                return entity

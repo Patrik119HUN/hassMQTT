@@ -27,7 +27,7 @@ class ModbusDriver(AbstractDriver):
     def disconnect(self):
         logger.info(f"Disconnecting from {self.__id}")
 
-    def send_data(self, address: int, value: int):
+    def send_data(self, address: int, value: int | bool):
         """
         Writes a value to a specific register on a Modbus device using the specified
         address and slave ID.
@@ -43,9 +43,11 @@ class ModbusDriver(AbstractDriver):
                 self.__modbus.write_register(address=address, value=value, slave=self.__id)
             else:
                 self.__modbus.write_coil(address=address, value=value, slave=self.__id)
-            logger.debug(f"Writing register to device at address {self.__id} with the value of {value}")
+            logger.debug(
+                f"Writing register to device at address {self.__id} with the value of {value}"
+            )
         except ModbusException as e:
-            logger.error( f"Modbus write error at id: {self.__id}, address:{address}, {e}" )
+            logger.error(f"Modbus write error at id: {self.__id}, address:{address}, {e}")
             raise RuntimeError(e)
 
     def get_data(self, address: int):
