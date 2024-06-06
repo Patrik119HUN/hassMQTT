@@ -1,31 +1,29 @@
-import logging.config
-from shos.config_manager import load_config
-from typing import Any
-from pathlib import Path
-from shos.utils.modbus_factory import get_modbus
-import shos.device_manager as device_manager
-
-CONFIG_FILE = (Path(__file__).parent / "../config.json").resolve()
-config_manager: dict[str, Any] = load_config(CONFIG_FILE)
+from src.device_manager import device_manager
+from src.mqtt import mqtt_manager
+from src.home_assistant.mqtt_adapter import get_discovery
+from src.home_assistant.mqtt_adapter.binary_light_observer import *
 
 
 def main():
-    """
-    Sets up logging configuration, creates a Modbus manager, connects it to the
-    devices, and then creates and returns a list of devices with the desired colors.
+    for device in device_manager.list():
+        topic, discovery_packet = get_discovery(device)
+        mqtt_manager.publish(topic, discovery_packet.model_dump_json(indent=2, exclude_none=True))
+        mqtt_manager.add_subscriber(
+            discovery_packet.command_topic,
+            BinaryObserver(mqtt_manager, discovery_packet, device),
+        )
+        if hasattr(discovery_packet, "brightness_command_topic"):
+            mqtt_manager.add_subscriber(
+                discovery_packet.brightness_command_topic,
+                BrightnessObserver(mqtt_manager, discovery_packet, device),
+            )
+        if hasattr(discovery_packet, "rgb_command_topic"):
+            mqtt_manager.add_subscriber(
+                discovery_packet.rgb_command_topic,
+                RGBObserver(mqtt_manager, discovery_packet, device),
+            )
 
-    """
-    logging.config.dictConfig(config_manager["logging"])
-    modbus_manager = get_modbus(**config_manager["modbus"])
-    modbus_manager.connect()
-
-    asd: list[device_manager.Device] = []
-    for x in config_manager["devices"]:
-        asd.append(device_manager.Device(**x))
-    device_manager.modbus_manager = modbus_manager
-    dev_list = device_manager.create_devices(asd)
-    light = dev_list[0]
-    light.state = False
+    mqtt_manager.loop()
 
 
 if __name__ == "__main__":

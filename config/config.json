@@ -1,6 +1,6 @@
 {
     "mqtt": {
-        "broker": "192.168.1.20",
+        "broker": "localhost",
         "client_id": "client",
         "port": 1883
     },
@@ -11,6 +11,7 @@
     },
     "devices": [
         {
+            "unique_id": "asd_123",
             "name": "haloszoba",
             "device_type": "light",
             "color_mode": "binary",
@@ -18,6 +19,7 @@
             "hardware_type": "modbus"
         }
     ],
+    "database": "home_assistant.db",
     "logging": {
         "version": 1,
         "disable_existing_loggers": false,
