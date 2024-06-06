@@ -49,14 +49,12 @@ class MQTTManager:
         self.__mqtt_instance.on_message = self.__on_message
 
         self.__mqtt_instance.connect(host=broker, port=port)
-        logger.info(
-            f"MQTT manager connected to:{broker}:{port} with username:{username}"
-        )
+        logger.info(f"MQTT manager connected to:{broker}:{port} with username:{username}")
 
     def __on_message(self, client: Client, userdata, msg: MQTTMessage):
         message = msg.payload.decode("utf-8")
-        topic = StringToTopic(TopicType.SUBSCRIBER, msg.topic).build()
-        self.notify(topic, msg.payload)
+        topic = Topic.from_str(TopicType.SUBSCRIBER, msg.topic)
+        self.__notify_subscriber(topic, msg.payload)
         logger.debug(f"Received {message} from {msg.topic} topic")
 
     @staticmethod
@@ -83,27 +81,25 @@ class MQTTManager:
             logger.error("Could not use a SUBSCRIBER topic as a publisher")
             raise MQTTException("Could not use a SUBSCRIBER topic as a publisher")
 
-    def subscribe(self, topic: Topic):
+    def add_subscriber(self, topic: Topic, observer: TopicObserver):
+        topic_str: str = topic.build()
         if topic.get_topic_type is TopicType.SUBSCRIBER:
-            self.__mqtt_instance.subscribe(topic=topic.build())
-            logger.info(f"Client subscribed to:{topic.build()}")
+            self.__mqtt_instance.subscribe(topic=topic_str)
+            logger.info(f"Client subscribed to:{topic_str}")
         else:
             logger.error("Could not use a PUBLISHER topic as a subscriber")
             raise MQTTException("Could not use a PUBLISHER topic as a subscriber")
+        if topic_str not in self.__subscribers:
+            self.__subscribers[topic_str] = []
+        self.__subscribers[topic_str].append(observer)
 
-    def add_subscriber(self, topic: Topic, observer: TopicObserver):
-        logger.info(f"Client subscribed to:{topic.build()}")
-        if topic.build() not in self.__subscribers:
-            self.__subscribers[topic.build()] = []
-        self.__subscribers[topic.build()].append(observer)
-
-    def remove_observ(self, topic: Topic, observer: TopicObserver):
+    def remove_subscriber(self, topic: Topic, observer: TopicObserver):
         if topic in self.__subscribers:
             self.__subscribers[topic.build()].remove(observer)
             if not self.__subscribers[topic.build()]:
                 del self.__subscribers[topic.build()]
 
-    def notify(self, topic: Topic, payload: bytes):
+    def __notify_subscriber(self, topic: Topic, payload: bytes):
         if topic.build() in self.__subscribers:
             for observer in self.__subscribers[topic.build()]:
                 logger.info(f"Notifying observer:{topic.build()}")
@@ -111,7 +107,3 @@ class MQTTManager:
 
     def loop(self):
         self.__mqtt_instance.loop_forever()
-
-    @property
-    def client(self):
-        return self.__mqtt_instance
