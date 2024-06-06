@@ -4,15 +4,15 @@ from abc import ABC, abstractmethod
 class IRepository[T](ABC):
     _path: str
 
-    def __init(self, path: str):
+    def __init__(self, path: str):
         self._path = path
 
     @abstractmethod
-    def get_all(self) -> list[T]:
+    def list(self) -> list[T]:
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_id(self, item_id: int) -> T:
+    def get(self, item_id: int) -> T:
         raise NotImplementedError
 
     @abstractmethod

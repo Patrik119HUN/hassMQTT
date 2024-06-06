@@ -7,39 +7,39 @@ from .hardware_repository import HardwareRepository
 
 
 class EntityRepository(IRepository[Entity]):
+    __hardware_repo: HardwareRepository
 
-    def __init__(self, path: str, harware_repo: HardwareRepository):
+    def __init__(self, path: str):
         super().__init__(path)
-        self.__hardware_repo = harware_repo
+        self.__hardware_repo = HardwareRepository(path)
 
-    def get_all(self) -> list[Entity]:
+    def list(self) -> list[Entity]:
         entity_list: List[Entity] = []
         with connect(self._path) as cursor:
-            cursor.row_factory = sqlite3.Row
             cursor.execute("SELECT * from entity")
             for entity in cursor.fetchall():
-                hardware = self.__hardware_repo.get_by_id(entity["hardware_id"])
+                hardware = self.__hardware_repo.get(entity["hardware_id"])
                 entity_list.append(
                     Entity(
                         name=entity["name"],
-                        device=hardware,
-                        device_class=entity["entity_type"],
+                        hardware=hardware,
+                        entity_type=entity["entity_type"],
                         icon=entity["icon"],
                         unique_id=entity["unique_id"],
                     )
                 )
             return entity_list
 
-    def get_by_id(self, item_id: int) -> Entity:
+    def get(self, item_id: int) -> Entity:
         with connect(self._path) as cursor:
             cursor.row_factory = sqlite3.Row
             cursor.execute("SELECT * from entity")
             entity = cursor.fetchone()
-            hardware = self.__hardware_repo.get_by_id(entity["hardware_id"])
+            hardware = self.__hardware_repo.get(entity["hardware_id"])
             return Entity(
                 name=entity["name"],
-                device=hardware,
-                device_class=entity["entity_type"],
+                hardware=hardware,
+                entity_type=entity["entity_type"],
                 icon=entity["icon"],
                 unique_id=entity["unique_id"],
             )
@@ -52,7 +52,7 @@ class EntityRepository(IRepository[Entity]):
                     item.unique_id,
                     item.name,
                     item.driver.__class__.__name__,
-                    item.device_class,
+                    item.entity_type,
                     1,
                     item.icon,
                 ],
