@@ -1,14 +1,15 @@
 import json
 from typing import Any
-
 from pathlib import Path
 from dotenv import dotenv_values
+from loguru import logger
 
 
 class ConfigManager:
     __config = None
 
     def __init__(self, file_name: str | Path = None):
+        logger.trace("ConfigManager initialized")
         self.__config = self.load_config(file_name)
 
     def __getitem__(self, item):
@@ -33,9 +34,10 @@ class ConfigManager:
         """
         try:
             with open(file_name, "r") as jsonfile:
+                logger.debug(f"Loading {file_name}")
                 _data = json.load(jsonfile)
         except FileNotFoundError:
-            raise RuntimeError("Unable to find config.json")
+            raise RuntimeError(f"Unable to find {file_name}")
         except ValueError:
             raise RuntimeError("Not valid JSON")
         return _data
