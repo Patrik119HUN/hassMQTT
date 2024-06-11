@@ -24,7 +24,6 @@ class EntityRepository(IRepository[Entity]):
                         name=entity["name"],
                         hardware=hardware,
                         entity_type=entity["entity_type"],
-                        icon=entity["icon"],
                         unique_id=entity["unique_id"],
                     )
                 )

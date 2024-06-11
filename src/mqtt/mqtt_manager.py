@@ -3,7 +3,7 @@ from paho.mqtt.enums import CallbackAPIVersion
 from paho.mqtt.reasoncodes import ReasonCode
 from paho.mqtt.properties import Properties, MQTTException
 from loguru import logger
-from src.mqtt.topic_builder import Topic, TopicType, StringToTopic
+from src.mqtt.topic_builder import Topic, TopicType
 from typing import Callable, List, Dict
 from abc import ABC, abstractmethod
 

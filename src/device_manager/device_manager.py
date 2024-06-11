@@ -1,9 +1,6 @@
-from src.home_assistant.driver.modbus_driver import ModbusDriver
 from src.device.device_factory import DeviceFactory
-from pymodbus.client.base import ModbusBaseSyncClient
 from src.device.entity import Entity
 from src.modbus_controller import modbus_controller
-from src.device.hardware import Hardware
 from src.repository import EntityRepository
 from src.config_manager import config_manager
 
@@ -12,8 +9,8 @@ class DeviceManager:
     __device_list: list[Entity] = []
     __device_factory: DeviceFactory
 
-    def __init__(self, modbus_driver=modbus_controller.instance):
-        self.__device_factory = DeviceFactory(modbus_driver)
+    def __init__(self):
+        self.__device_factory = DeviceFactory()
         for e in EntityRepository(config_manager["database"]).list():
             dev = self.__device_factory.get_device(
                 e.entity_type, e.name, e.unique_id, e.hardware, e.icon
