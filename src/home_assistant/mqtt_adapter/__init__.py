@@ -1,17 +1,20 @@
 from src.device.entity import Entity
-from dataclasses import dataclass
 from src.mqtt.topic_builder import Topic, TopicType
 from src.device.light import BinaryLight
 from src.device.binary_sensor import BinarySensor
-from src.home_assistant.mqtt_packet.discovery.visitor import MQTTVisitor
-from src.home_assistant.mqtt_packet.discovery.base_packet import MQTTDiscoveryPacket
-from typing import Tuple
+from src.device.alarm_control_panel import AlarmControlPanel
+from src.home_assistant.mqtt_packet.visitor import MQTTVisitor
+from typing import Tuple, Dict
 
 DISCOVERY_TOPIC = "homeassistant"
 
 
-def get_discovery(entity: Entity) -> Tuple[Topic, MQTTDiscoveryPacket]:
-    class_to_str = {BinaryLight: "light", BinarySensor: "sensor"}
+def get_discovery(entity: Entity) -> Tuple[Topic, Dict[str, str]]:
+    class_to_str = {
+        BinaryLight: "light",
+        BinarySensor: "sensor",
+        AlarmControlPanel: "alarm_control_panel",
+    }
     device_type: str = ""
     visitor = MQTTVisitor()
 
