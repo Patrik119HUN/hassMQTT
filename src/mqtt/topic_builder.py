@@ -1,12 +1,14 @@
-from enum import Enum, auto
+from enum import Enum, auto, StrEnum
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
 from typing import Any, List
 
+import json
 
-class TopicType(Enum):
-    SUBSCRIBER = auto()
-    PUBLISHER = auto()
+
+class TopicType(StrEnum):
+    SUBSCRIBER = "SUBSCRIBER"
+    PUBLISHER = "PUBLISHER"
 
 
 class Topic:
@@ -28,8 +30,9 @@ class Topic:
         self.__list = list()
         pass
 
-    def add(self, value: str):
-        self.__list.append(value)
+    def add(self, *args: str):
+        for i in args:
+            self.__list.append(i)
         return self
 
     def pop(self):
@@ -82,6 +85,9 @@ class Topic:
             temp += x + "/"
         temp = temp[:-1]
         return temp
+
+    def to_json(self):
+        return json.dumps(self.build())
 
     @property
     def get_topic_type(self):
