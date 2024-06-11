@@ -1,19 +1,13 @@
 from src.device.entity import Entity
 from src.device.hardware import Hardware
+from .light_builder import light_registry
 
 
+@light_registry.register
 class BinaryLight(Entity):
+    __light__ = "binary"
+    entity_type: str = "binary_light"
     __state: bool = False
-
-    def __init__(
-        self,
-        name: str,
-        hardware: Hardware = None,
-        icon: str = None,
-        unique_id: str = None,
-        entity_type: str = "light",
-    ):
-        Entity.__init__(self, name, hardware, entity_type, icon, unique_id)
 
     @property
     def state(self) -> bool:

@@ -1,10 +1,14 @@
-from src.device.light.brightness_light import BrightnessLight
+from src.device.light.brightness_light import BrightnessLight, Hardware, Entity
 from src.utils.clamp import clamp
+from .light_builder import light_registry
 
 MAX_LIGHT_VALUE: int = 255
 
 
+@light_registry.register
 class RGBLight(BrightnessLight):
+    __light__ = "rgb"
+    entity_type: str = "rgb_light"
     __red: int = 0
     __green: int = 0
     __blue: int = 0

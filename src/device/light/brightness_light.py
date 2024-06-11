@@ -1,10 +1,14 @@
-from src.device.light.binary_light import BinaryLight
+from src.device.light.binary_light import BinaryLight, Hardware, Entity
 from src.utils.clamp import clamp
+from .light_builder import light_registry
 
 MAX_LIGHT_VALUE: int = 255
 
 
+@light_registry.register
 class BrightnessLight(BinaryLight):
+    __light__ = "brightness"
+    entity_type: str = "brightness_light"
     __brightness: int = 0
 
     @property
