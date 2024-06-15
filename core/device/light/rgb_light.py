@@ -5,10 +5,9 @@ from .light_builder import light_registry
 MAX_LIGHT_VALUE: int = 255
 
 
-@light_registry.register
+@light_registry.register("rgb")
 class RGBLight(BrightnessLight):
-    __light__ = "rgb"
-    entity_type: str = "rgb_light"
+    color_mode: str = "rgb"
     __red: int = 0
     __green: int = 0
     __blue: int = 0

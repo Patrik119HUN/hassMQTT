@@ -16,12 +16,12 @@ class DeviceFactory:
         self.__driver_factory = DriverFactory()
 
     def get_device(
-        self, device_type: str, name: str, unique_id: str, hardware: Hardware, icon: str
+        self, device_type: str, name: str, unique_id: str, hardware: Hardware, icon: str, **kwargs
     ) -> Entity:
         created_dev = None
         for builder_type, builder in device_builder.items():
             if builder_type == device_type:
-                created_dev = builder().get(unique_id, name, hardware, icon)
+                created_dev = builder().get(unique_id, name, hardware, icon, **kwargs)
         logger.debug(f"created an {created_dev.__class__.__name__}")
-        created_dev.driver = self.__driver_factory.get(unique_id)
+        created_dev.driver = self.__driver_factory.get(unique_id, **kwargs)
         return created_dev

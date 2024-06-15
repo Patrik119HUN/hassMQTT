@@ -3,10 +3,9 @@ from core.device.hardware import Hardware
 from .light_builder import light_registry
 
 
-@light_registry.register
+@light_registry.register("binary")
 class BinaryLight(Entity):
-    __light__ = "binary"
-    entity_type: str = "binary_light"
+    color_mode: str = "binary"
     __state: bool = False
 
     @property

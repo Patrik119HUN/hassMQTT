@@ -10,15 +10,16 @@ from core.modbus_controller import modbus_controller
 class DriverFactory:
     __device_driver_repository: DeviceDriverRepository = None
     __modbus_manager: ModbusBaseSyncClient = None
-    __driver_registry = {"modbus": ModbusDriver, "can": None, "hat": None}
+    __driver_registry = {"ModbusDriver": ModbusDriver, "can": None, "hat": None}
 
     def __init__(self, modbus_manager: ModbusBaseSyncClient = modbus_controller.instance):
         logger.trace("DeviceFactory initialized")
         self.__device_driver_repository = DeviceDriverRepository(config_manager["database"])
         self.__modbus_manager = modbus_manager
 
-    def get(self, unique_id: str) -> AbstractDriver:
+    def get(self, unique_id: str, **kwargs) -> AbstractDriver:
         params = self.__device_driver_repository.get(unique_id)
-        driver = self.__driver_registry[params["driver"]](self.__modbus_manager)
-        driver.connect(id=params["address"])
+        driver_type = kwargs.get("driver", params["driver"])
+        driver = self.__driver_registry[driver_type](self.__modbus_manager)
+        driver.connect(id=kwargs.get("address", params["address"]))
         return driver

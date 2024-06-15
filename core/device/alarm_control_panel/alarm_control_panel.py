@@ -21,11 +21,23 @@ class AlarmControlPanel(Entity):
             icon=icon,
         )
 
-    def alarm(self):
-        print("alarm")
+    def state(self):
+        self.driver.get_data(1, 0)
 
-    def disarm(self):
-        print("disarm")
+    def arm_home(self):
+        self.driver.send_data(0, 1)
+
+    def arm_away(self):
+        self.driver.send_data(0, 2)
+
+    def arm_night(self):
+        self.driver.send_data(0, 3)
+
+    def arm_vacation(self):
+        self.driver.send_data(0, 4)
+
+    def arm_custom(self):
+        self.driver.send_data(0, 5)
 
     def accept(self, visitor):
         visitor.alarm_control_panel(self)

@@ -3,12 +3,12 @@ from core.home_assistant.mqtt_adapter import get_discovery
 from core.home_assistant.mqtt_adapter.binary_light_observer import *
 from core.mqtt.topic_builder import Topic, TopicType
 from core.device_manager import device_manager
-
+import json
 
 def main():
     for device in device_manager.list():
         topic, discovery_packet = get_discovery(device)
-        # mqtt_manager.publish(topic, json.dumps(discovery_packet, indent=2))
+        mqtt_manager.publish(topic, json.dumps(discovery_packet, indent=2))
         mqtt_manager.add_subscriber(
             Topic.from_str(TopicType.SUBSCRIBER, discovery_packet["command_topic"]),
             BinaryObserver(mqtt_manager, discovery_packet, device),

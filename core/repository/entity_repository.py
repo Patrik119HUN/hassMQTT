@@ -46,11 +46,10 @@ class EntityRepository(IRepository[Entity]):
     def create(self, item: Entity) -> None:
         with connect(self._path) as cursor:
             cursor.execute(
-                "INSERT INTO entity VALUES (?, ?, ?, ?, ?,?)",
+                "INSERT INTO entity VALUES (?, ?, ?, ?, ?)",
                 [
                     item.unique_id,
                     item.name,
-                    item.driver.__class__.__name__,
                     item.entity_type,
                     1,
                     item.icon,

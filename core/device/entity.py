@@ -16,10 +16,10 @@ class Entity(BaseModel):
 
     name: str
     unique_id: str = None
-    hardware: Optional[Hardware] = None
     entity_type: Optional[str] = None
     icon: Optional[str] = None
     driver: Optional[CustomStr] = None
+    hardware: Optional[Hardware] = None
 
     def accept(self, visitor):
         pass

@@ -4,7 +4,7 @@ from core.repository import LightRepository
 from core.config_manager import config_manager
 from class_registry import ClassRegistry
 
-light_registry = ClassRegistry("__light__")
+light_registry = ClassRegistry()
 
 
 @device_builder.register("light")
@@ -17,10 +17,16 @@ class LightBuilder(DeviceBuilder):
     ):
         self.__light_repository = light_repository
 
-    def get(self, unique_id: str, name: str, hardware: Hardware, icon: str):
-        params = self.__light_repository.get(unique_id)
-        if params["color_mode"] not in light_registry:
-            raise RuntimeError(f"No such a light type:{params["color_mode"]}")
+    def get(self, unique_id: str, name: str, hardware: Hardware, icon: str, **kwargs):
+        color_mode = kwargs.get("color_mode", self.__light_repository.get(unique_id)["color_mode"])
+        if color_mode not in light_registry:
+            raise RuntimeError(f"No such a light type:{color_mode}")
         for x, y in light_registry.items():
-            if x == params["color_mode"]:
-                return y(name=name, unique_id=unique_id, hardware=hardware, icon=icon)
+            if x == color_mode:
+                return y(
+                    name=name,
+                    unique_id=unique_id,
+                    hardware=hardware,
+                    icon=icon,
+                    entity_type="light",
+                )

@@ -24,8 +24,8 @@ class LightRepository(IRepository[Hardware]):
             cursor.execute(
                 "INSERT INTO light VALUES (?, ?)",
                 [
-                    item["unique_id"],
-                    item["color_mode"],
+                    item.unique_id,
+                    item.color_mode,
                 ],
             )
         pass

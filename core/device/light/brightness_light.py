@@ -5,10 +5,9 @@ from .light_builder import light_registry
 MAX_LIGHT_VALUE: int = 255
 
 
-@light_registry.register
+@light_registry.register("brightness")
 class BrightnessLight(BinaryLight):
-    __light__ = "brightness"
-    entity_type: str = "brightness_light"
+    color_mode: str = "brightness"
     __brightness: int = 0
 
     @property
