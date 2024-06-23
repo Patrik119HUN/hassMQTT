@@ -13,7 +13,6 @@ class EntityObserver(TopicObserver, ABC):
 
     def __init__(self, mqtt_manager: MQTTManager, topics: Dict[str, str], entity: Entity):
         self._mqtt_manager = mqtt_manager
-        time.sleep(1)
         self._mqtt_manager.publish(
             Topic.from_str(TopicType.PUBLISHER, topics["availability_topic"]), "online"
         )
