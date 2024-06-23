@@ -54,16 +54,12 @@ class MQTTManager:
     def __on_message(self, client: Client, userdata, msg: MQTTMessage):
         message = msg.payload.decode("utf-8")
         topic = Topic.from_str(TopicType.SUBSCRIBER, msg.topic)
-        self.__notify_subscriber(topic, msg.payload)
         logger.debug(f"Received {message} from {msg.topic} topic")
+        self.__notify_subscriber(topic, msg.payload)
 
     @staticmethod
     def __on_connect(
-        client: Client,
-        userdata,
-        flags: ConnectFlags,
-        reason_code: ReasonCode,
-        property: Properties,
+        client: Client, userdata, flags: ConnectFlags, reason_code: ReasonCode, property: Properties
     ):
         if reason_code.is_failure:
             logger.error(f"Failed to connect: {reason_code}. retrying")
@@ -71,24 +67,24 @@ class MQTTManager:
             logger.debug(reason_code.getName())
 
     def publish(self, topic: Topic, payload: str | bytes | bytearray | float | None):
-        if topic.get_topic_type is TopicType.PUBLISHER:
-            self.__mqtt_instance.publish(
-                topic=topic.build(),
-                payload=payload,
-                qos=0,
-            )
-        else:
+        if topic.get_topic_type is TopicType.SUBSCRIBER:
             logger.error("Could not use a SUBSCRIBER topic as a publisher")
             raise MQTTException("Could not use a SUBSCRIBER topic as a publisher")
 
+        self.__mqtt_instance.publish(
+            topic=topic.build(),
+            payload=payload,
+            qos=0,
+        )
+
     def add_subscriber(self, topic: Topic, observer: TopicObserver):
         topic_str: str = topic.build()
-        if topic.get_topic_type is TopicType.SUBSCRIBER:
-            self.__mqtt_instance.subscribe(topic=topic_str)
-            logger.info(f"Client subscribed to:{topic_str}")
-        else:
+        if topic.get_topic_type is TopicType.PUBLISHER:
             logger.error("Could not use a PUBLISHER topic as a subscriber")
             raise MQTTException("Could not use a PUBLISHER topic as a subscriber")
+
+        self.__mqtt_instance.subscribe(topic=topic_str)
+        logger.info(f"Client subscribed to:{topic_str}")
         if topic_str not in self.__subscribers:
             self.__subscribers[topic_str] = []
         self.__subscribers[topic_str].append(observer)
