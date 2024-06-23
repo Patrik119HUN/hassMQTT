@@ -1,7 +1,7 @@
 from core.device.entity import Entity
 from core.device.hardware import Hardware
 from loguru import logger
-from core.device.driver_factory import DriverFactory
+from core.device.driver.driver_factory import DriverFactory
 from core.device.light import LightBuilder
 from core.device.alarm_control_panel import AlarmBuilder
 

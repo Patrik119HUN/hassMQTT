@@ -2,7 +2,7 @@ from loguru import logger
 
 from pymodbus import ModbusException
 from pymodbus.client.base import ModbusBaseSyncClient
-from core.home_assistant.driver.abstract_driver import AbstractDriver
+from .abstract_driver import AbstractDriver
 
 
 class ModbusDriver(AbstractDriver):

@@ -1,9 +1,9 @@
 from pymodbus.client.base import ModbusBaseSyncClient
-from core.home_assistant.driver.modbus_driver import ModbusDriver
+from core.device.driver.modbus_driver import ModbusDriver
 from loguru import logger
 from core.repository import DeviceDriverRepository
 from core.config_manager import config_manager
-from core.home_assistant.driver.abstract_driver import AbstractDriver
+from core.device.driver.abstract_driver import AbstractDriver
 from core.modbus_controller import modbus_controller
 
 

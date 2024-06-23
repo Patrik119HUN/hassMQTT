@@ -1,9 +1,7 @@
-from core.home_assistant.driver.abstract_driver import AbstractDriver
+from core.device.driver.abstract_driver import AbstractDriver
 from typing import Optional
-from core.utils.id_generator import generate_id
 from core.device.hardware import Hardware
-from pydantic import BaseModel, GetCoreSchemaHandler, ConfigDict, Field, PlainSerializer
-from typing import Any
+from pydantic import BaseModel, ConfigDict, PlainSerializer
 from typing_extensions import Annotated
 
 CustomStr = Annotated[
