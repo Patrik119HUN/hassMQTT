@@ -38,6 +38,3 @@ class AlarmControlPanel(Entity):
 
     def arm_custom(self):
         self.driver.send_data(0, 5)
-
-    def accept(self, visitor):
-        visitor.alarm_control_panel(self)

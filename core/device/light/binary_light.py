@@ -26,9 +26,6 @@ class BinaryLight(Entity):
         self.__state = state
         self.driver.send_data(0, state)
 
-    def accept(self, visitor):
-        visitor.binary_light(self)
-
     @classmethod
     def from_entity(cls, entity: Entity):
         return cls(entity.name, entity.hardware, entity.entity_type, entity.icon, entity.unique_id)

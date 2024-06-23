@@ -49,6 +49,3 @@ class RGBLight(BrightnessLight):
         self.red = red
         self.green = green
         self.blue = blue
-
-    def accept(self, visitor):
-        visitor.rgb_light(self)

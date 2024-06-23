@@ -31,6 +31,3 @@ class BrightnessLight(BinaryLight):
         self.__brightness = clamp(brightness, 0, MAX_LIGHT_VALUE)
         self.driver.send_data(1, self.__brightness)
         self.state = True if self.__brightness != 0 else False
-
-    def accept(self, visitor):
-        visitor.brightness_light(self)
