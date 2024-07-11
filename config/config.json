@@ -9,17 +9,7 @@
         "port": "/dev/ttyS0",
         "baudrate": 9600
     },
-    "devices": [
-        {
-            "unique_id": "asd_123",
-            "name": "haloszoba",
-            "device_type": "light",
-            "color_mode": "binary",
-            "device_id": 1,
-            "hardware_type": "modbus"
-        }
-    ],
-    "database": "home_assistant.db",
+    "database": "C:\\Users\\patri\\PycharmProjects\\hassMQTT\\home_assistant.db",
     "logging": {
         "version": 1,
         "disable_existing_loggers": false,
