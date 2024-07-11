@@ -18,7 +18,11 @@ class LightBuilder(DeviceBuilder):
         self.__light_repository = light_repository
 
     def get(self, unique_id: str, name: str, hardware: Hardware, icon: str, **kwargs):
-        color_mode = kwargs.get("color_mode", self.__light_repository.get(unique_id)["color_mode"])
+        color_mode: str = ""
+        if kwargs.get("color_mode") is None:
+            color_mode = self.__light_repository.get(unique_id)["color_mode"]
+        else:
+            color_mode = kwargs.get("color_mode")
         if color_mode not in light_registry:
             raise RuntimeError(f"No such a light type:{color_mode}")
         for x, y in light_registry.items():

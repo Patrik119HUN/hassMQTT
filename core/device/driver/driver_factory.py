@@ -19,7 +19,16 @@ class DriverFactory:
 
     def get(self, unique_id: str, **kwargs) -> AbstractDriver:
         params = self.__device_driver_repository.get(unique_id)
-        driver_type = kwargs.get("driver", params["driver"])
+        driver_type: str = ""
+        if kwargs.get("driver") is None:
+            driver_type = params["driver"]
+        else:
+            driver_type = kwargs.get("driver")
         driver = self.__driver_registry[driver_type](self.__modbus_manager)
-        driver.connect(id=kwargs.get("address", params["address"]))
+        address: int = 0
+        if kwargs.get("address") is None:
+            address = params["address"]
+        else:
+            address = kwargs.get("address")
+        driver.connect(id=address)
         return driver
