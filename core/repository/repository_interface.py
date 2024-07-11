@@ -12,7 +12,7 @@ class IRepository[T](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, item_id: int) -> T:
+    def get(self, unique_id: str) -> T:
         raise NotImplementedError
 
     @abstractmethod
@@ -20,9 +20,9 @@ class IRepository[T](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, item: int, *args, **kwargs) -> None:
+    def update(self, unique_id: str | int, item) -> int:
         raise NotImplementedError
 
     @abstractmethod
-    def delete(self, item_id: int) -> None:
+    def delete(self, unique_id: str | int) -> int:
         raise NotImplementedError

@@ -5,7 +5,6 @@ from typing import List, Dict
 
 
 class LightRepository(IRepository[Hardware]):
-
     def __init__(self, path: str):
         super().__init__(path)
 
@@ -16,7 +15,7 @@ class LightRepository(IRepository[Hardware]):
 
     def get(self, item_id: str) -> Dict[str, str]:
         with connect(self._path) as cursor:
-            cursor.execute("SELECT * from light where device_id== ?", [item_id])
+            cursor.execute("SELECT * from light where light.unique_id== ?", [item_id])
             return cursor.fetchone()
 
     def create(self, item) -> None:
@@ -28,10 +27,16 @@ class LightRepository(IRepository[Hardware]):
                     item.color_mode,
                 ],
             )
-        pass
 
-    def update(self, item: int, *args, **kwargs) -> None:
-        pass
+    def update(self, unique_id: str, item) -> int:
+        with connect(self._path) as cursor:
+            cursor.execute(
+                "UPDATE light SET color_mode=? WHERE unique_id=?",
+                [item.color_mode, unique_id],
+            )
+            return cursor.rowcount > 0
 
-    def delete(self, item_id: int) -> None:
-        pass
+    def delete(self, unique_id: str) -> int:
+        with connect(self._path) as cursor:
+            cursor.execute("DELETE FROM light WHERE unique_id=?", [unique_id])
+            return cursor.rowcount > 0
