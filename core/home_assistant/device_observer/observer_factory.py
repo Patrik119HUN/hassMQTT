@@ -17,7 +17,6 @@ observer_registry: Dict[type, type] = {
 observer_dict = {
     "brightness_command_topic": BrightnessObserver,
     "rgb_command_topic": RGBObserver,
-    "command_topic": BinaryObserver,
 }
 
 B = TypeVar("B", bound=EntityObserver)
@@ -35,4 +34,8 @@ class ObserverFactory:
             if topic in topics:
                 subscriber = topics[topic]
                 observers[subscriber] = observer(self._mqtt_manager, topics, entity)
+        if "command_topic" in topics:
+            observers[topics["command_topic"]] = observer_registry[type(entity)](
+                self._mqtt_manager, topics, entity
+            )
         return observers
