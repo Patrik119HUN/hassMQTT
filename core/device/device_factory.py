@@ -9,8 +9,6 @@ device_builder = {"light": LightBuilder, "alarm": AlarmBuilder}
 
 
 class DeviceFactory:
-    __driver_factory: DriverFactory = None
-
     def __init__(self):
         logger.trace("DeviceFactory initialized")
         self.__driver_factory = DriverFactory()

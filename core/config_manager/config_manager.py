@@ -6,8 +6,6 @@ from loguru import logger
 
 
 class ConfigManager:
-    __config = None
-
     def __init__(self, file_name: str | Path = None):
         logger.trace("ConfigManager initialized")
         self.__config = self.load_config(file_name)

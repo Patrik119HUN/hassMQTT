@@ -1,6 +1,5 @@
 from core.device.device_factory import DeviceFactory
 from core.device.entity import Entity
-from core.modbus_controller import modbus_controller
 from core.repository import (
     EntityRepository,
     DeviceDriverRepository,
@@ -13,11 +12,6 @@ from core.device.light import BinaryLight
 
 class DeviceManager:
     __device_list: list[Entity] = []
-    __device_factory: DeviceFactory
-    __entity_repository: EntityRepository = None
-    __device_driver_repository: DeviceDriverRepository = None
-    __hardware_repository: HardwareRepository = None
-    __light_repository: LightRepository = None
 
     def __init__(self):
         self.__entity_repository = EntityRepository(config_manager["database"])
@@ -35,16 +29,16 @@ class DeviceManager:
 
     def add(self, entity: Entity):
         self.__entity_repository.create(entity)
+        self.__device_driver_repository.create(entity)
+        self.__hardware_repository.create(entity)
         if isinstance(entity, BinaryLight):
             self.__light_repository.create(entity)
-            items = {
-                "unique_id": entity.unique_id,
-                "driver": entity.driver.__class__.__name__,
-                "address": 1
-            }
-            self.__device_driver_repository.create(items)
 
     def remove(self, unique_id: str):
+        self.__entity_repository.delete(unique_id)
+        self.__device_driver_repository.delete(unique_id)
+        self.__hardware_repository.delete(unique_id)
+        self.__light_repository.create(unique_id)
         entity = self.get(unique_id)
         self.__device_list.remove(entity)
 
