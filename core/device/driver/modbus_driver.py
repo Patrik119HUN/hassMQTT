@@ -56,3 +56,6 @@ class ModbusDriver(AbstractDriver):
         except ModbusException as e:
             logger.error(e)
         pass
+
+    def get_address(self):
+        return self.__id
