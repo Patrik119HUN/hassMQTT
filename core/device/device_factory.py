@@ -28,5 +28,6 @@ class DeviceFactory:
             if builder_type == device_type:
                 created_dev = builder().get(unique_id, name, hardware, icon, **kwargs)
         logger.debug(f"created an {created_dev.__class__.__name__}")
-        created_dev.driver = self.__driver_factory.get(unique_id, **kwargs)
+        if device_type != "sensor":
+            created_dev.driver = self.__driver_factory.get(unique_id, **kwargs)
         return created_dev
