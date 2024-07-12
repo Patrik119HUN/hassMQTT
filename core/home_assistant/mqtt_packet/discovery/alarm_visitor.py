@@ -8,4 +8,10 @@ class AlarmVisitor(Discovery, Visitor):
     def visit(self, visitable: Entity):
         if type(visitable) is not AlarmControlPanel:
             return None
-        return self.packet(visitable)
+        packet = self.packet(visitable)
+        packet.update(
+            {
+                "code": '1234'
+            }
+        )
+        return packet 

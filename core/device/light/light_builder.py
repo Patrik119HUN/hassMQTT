@@ -9,12 +9,7 @@ light_registry = ClassRegistry()
 
 @device_builder.register("light")
 class LightBuilder(DeviceBuilder):
-
-    __light_repository: LightRepository = None
-
-    def __init__(
-        self, light_repository: LightRepository = LightRepository(config_manager["database"])
-    ):
+    def __init__(self, light_repository=LightRepository(config_manager["database"])):
         self.__light_repository = light_repository
 
     def get(self, unique_id: str, name: str, hardware: Hardware, icon: str, **kwargs):

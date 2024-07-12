@@ -1,9 +1,11 @@
 from core.device.entity import Entity
 from core.device.hardware import Hardware
+from gpiozero import Button
+
+from pydantic import PrivateAttr
 
 
 class AlarmControlPanel(Entity):
-
     def __init__(
         self,
         name: str,
@@ -20,9 +22,14 @@ class AlarmControlPanel(Entity):
             entity_type=entity_type,
             icon=icon,
         )
+        self._button: Button = Button(4)
 
     def state(self):
-        self.driver.get_data(1, 0)
+        if self._button.is_pressed:
+            print("triggered")
+            return True
+        else:
+            return False
 
     def arm_home(self):
         self.driver.send_data(0, 1)

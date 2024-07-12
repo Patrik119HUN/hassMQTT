@@ -2,7 +2,7 @@ from typing import List
 from abc import ABC, abstractmethod
 from .zone import Zone, ZoneType
 import threading
-
+import time
 
 class AlarmState(ABC):
     _event = threading.Event()
@@ -18,17 +18,18 @@ class HomeState(AlarmState):
     """
 
     def __init__(self):
-        threading.Thread(target=self.state).start()
-
+        #threading.Thread(target=self.state).start()
+        pass
+    
     def state(self):
-        self._event.wait()
         print("triggered")
 
     def handle_request(self, zones: List[Zone]):
         for zone in zones:
             if zone.zone_type != ZoneType.MotionSensor:
                 if zone.state:
-                    self._event.set()
+                    self.state()
+                    time.sleep(1)
 
 
 class AwayState(AlarmState):

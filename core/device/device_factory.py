@@ -4,8 +4,9 @@ from loguru import logger
 from core.device.driver.driver_factory import DriverFactory
 from core.device.light import LightBuilder
 from core.device.alarm_control_panel import AlarmBuilder
+from core.device.binary_sensor import SensorBuilder
 
-device_builder = {"light": LightBuilder, "alarm": AlarmBuilder}
+device_builder = {"light": LightBuilder, "alarm": AlarmBuilder, "sensor": SensorBuilder}
 
 
 class DeviceFactory:
@@ -14,7 +15,13 @@ class DeviceFactory:
         self.__driver_factory = DriverFactory()
 
     def get_device(
-        self, device_type: str, name: str, unique_id: str, hardware: Hardware, icon: str, **kwargs
+        self,
+        device_type: str,
+        name: str,
+        unique_id: str,
+        hardware: Hardware,
+        icon: str,
+        **kwargs,
     ) -> Entity:
         created_dev = None
         for builder_type, builder in device_builder.items():
