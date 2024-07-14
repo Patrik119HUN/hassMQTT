@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class IRepository[T](ABC):
+class DAOInterface[T](ABC):
     _path: str
 
     def __init__(self, path: str):

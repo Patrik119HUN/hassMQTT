@@ -1,11 +1,9 @@
-from core.device.light.binary_light import BinaryLight, Hardware, Entity
+from core.device.light.binary_light import BinaryLight
 from core.utils.clamp import clamp
-from .light_builder import light_registry
 
 MAX_LIGHT_VALUE: int = 255
 
 
-@light_registry.register("brightness")
 class BrightnessLight(BinaryLight):
     color_mode: str = "brightness"
     __brightness: int = 0

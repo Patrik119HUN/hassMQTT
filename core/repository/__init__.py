@@ -1,4 +1,3 @@
-from .entity_repository import EntityRepository
-from .hardware_repository import HardwareRepository
 from .light_repository import LightRepository
-from .device_driver_repository import DeviceDriverRepository
+from .alarm_repository import AlarmRepository
+from .sensor_repository import SensorRepository

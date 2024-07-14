@@ -1,15 +1,15 @@
-from core.repository.repository_interface import IRepository
+from .dao_interface import DAOInterface
 import sqlite3
 from typing import List
 from core.device.entity import Entity
 from core.utils.db_connect import connect
-from .hardware_repository import HardwareRepository
+from .hardware_dao import HardwareDAO
 
 
-class EntityRepository(IRepository[Entity]):
+class EntityDAO(DAOInterface[Entity]):
     def __init__(self, path: str):
         super().__init__(path)
-        self.__hardware_repo: HardwareRepository = HardwareRepository(path)
+        self.__hardware_repo: HardwareDAO = HardwareDAO(path)
 
     def list(self) -> list[Entity]:
         entity_list: List[Entity] = []
@@ -20,11 +20,13 @@ class EntityRepository(IRepository[Entity]):
                 entity_list.append(Entity(**entity, hardware=hardware))
             return entity_list
 
-    def get(self, item_id: int) -> Entity:
+    def get(self, item_id: str) -> Entity | None:
         with connect(self._path) as cursor:
             cursor.row_factory = sqlite3.Row
-            cursor.execute("SELECT * from entity")
+            cursor.execute("SELECT * from entity WHERE unique_id=?", [item_id])
             entity = cursor.fetchone()
+            if entity is None:
+                return None
             hardware = self.__hardware_repo.get(entity["unique_id"])
             return Entity(**entity, hardware=hardware)
 

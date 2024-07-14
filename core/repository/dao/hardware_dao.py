@@ -1,11 +1,11 @@
-from .repository_interface import IRepository
+from .dao_interface import DAOInterface
 from core.device.hardware import Hardware
 from core.device.entity import Entity
 from core.utils.db_connect import connect
 from typing import List
 
 
-class HardwareRepository(IRepository[Hardware]):
+class HardwareDAO(DAOInterface[Hardware]):
     def __init__(self, path: str):
         super().__init__(path)
 

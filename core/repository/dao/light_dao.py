@@ -1,45 +1,42 @@
-from .repository_interface import IRepository
+from .dao_interface import DAOInterface
 from core.device.hardware import Hardware
 from core.utils.db_connect import connect
 from typing import List, Dict
-from core.device.entity import Entity
 
 
-class DeviceDriverRepository(IRepository[Hardware]):
-
+class LightDAO(DAOInterface[Hardware]):
     def __init__(self, path: str):
         super().__init__(path)
 
     def list(self) -> List[Dict[str, str]]:
         with connect(self._path) as cursor:
-            cursor.execute("SELECT * from device_driver")
+            cursor.execute("SELECT * from light")
             return [elem for elem in cursor.fetchall()]
 
-    def get(self, unique_id: str) -> Dict[str, str | int]:
+    def get(self, item_id: str) -> Dict[str, str]:
         with connect(self._path) as cursor:
-            cursor.execute("SELECT * from device_driver where unique_id== ?", [unique_id])
+            cursor.execute("SELECT * from light where light.unique_id== ?", [item_id])
             return cursor.fetchone()
 
-    def create(self, item: Entity) -> None:
+    def create(self, item) -> None:
         with connect(self._path) as cursor:
             cursor.execute(
-                "INSERT INTO device_driver VALUES (?, ?, ?)",
+                "INSERT INTO light VALUES (?, ?)",
                 [
                     item.unique_id,
-                    item.driver.__class__.__name__,
-                    item.driver.get_address(),
+                    item.color_mode,
                 ],
             )
 
     def update(self, unique_id: str, item) -> int:
         with connect(self._path) as cursor:
             cursor.execute(
-                "UPDATE device_driver SET driver=?, address=? WHERE unique_id=?",
-                [item.driver, item.address, unique_id],
+                "UPDATE light SET color_mode=? WHERE unique_id=?",
+                [item.color_mode, unique_id],
             )
             return cursor.rowcount > 0
 
     def delete(self, unique_id: str) -> int:
         with connect(self._path) as cursor:
-            cursor.execute("DELETE FROM device_driver WHERE unique_id=?", [unique_id])
+            cursor.execute("DELETE FROM light WHERE unique_id=?", [unique_id])
             return cursor.rowcount > 0

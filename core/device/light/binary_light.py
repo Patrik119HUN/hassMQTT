@@ -1,9 +1,6 @@
 from core.device.entity import Entity
-from core.device.hardware import Hardware
-from .light_builder import light_registry
 
 
-@light_registry.register("binary")
 class BinaryLight(Entity):
     color_mode: str = "binary"
     __state: bool = False

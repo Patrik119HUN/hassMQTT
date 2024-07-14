@@ -1,16 +1,34 @@
-from core.device.light.brightness_light import BrightnessLight, Hardware, Entity
+from core.device.light.brightness_light import BrightnessLight
+from core.device.entity import Entity
+from core.device.hardware import Hardware
 from core.utils.clamp import clamp
-from .light_builder import light_registry
+from core.utils.id_generator import generate_id
 
 MAX_LIGHT_VALUE: int = 255
 
 
-@light_registry.register("rgb")
 class RGBLight(BrightnessLight):
     color_mode: str = "rgb"
     __red: int = 0
     __green: int = 0
     __blue: int = 0
+
+    def __init__(
+        self,
+        name: str,
+        unique_id: str = generate_id(),
+        hardware: Hardware = None,
+        icon: str = None,
+        entity_type: str = "light",
+    ):
+        Entity.__init__(
+            self,
+            name=name,
+            unique_id=unique_id,
+            hardware=hardware,
+            icon=icon,
+            entity_type=entity_type,
+        )
 
     @property
     def red(self) -> int:
