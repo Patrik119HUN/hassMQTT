@@ -2,6 +2,8 @@ from core.device.entity import Entity
 from core.config_manager import config_manager
 from core.device.binary_sensor import BinarySensor
 from core.repository.dao import HardwareDAO, DeviceDriverDAO, EntityDAO, LightDAO
+from core.device.driver.gpio_driver import GPIODriver, PinType
+from loguru import logger
 
 
 class SensorRepository:
@@ -28,25 +30,33 @@ class SensorRepository:
     def list(self):
         for entity in self.__entity_dao.list():
             if entity.entity_type == "sensor":
-                yield BinarySensor(
-                    name=entity.name,
-                    unique_id=entity.unique_id,
-                    hardware=entity.hardware,
-                    icon=entity.icon,
-                    entity_type="sensor",
-                )
+                yield self.__create_sensor(entity)
 
     def get(self, unique_id: str):
         entity = self.__entity_dao.get(unique_id)
         if entity.entity_type == "sensor":
-            return BinarySensor(
-                name=entity.name,
-                unique_id=entity.unique_id,
-                hardware=entity.hardware,
-                icon=entity.icon,
-                entity_type="sensor",
-            )
+            self.__create_sensor(entity)
         return None
 
     def update(self, entity: Entity):
         pass
+
+    def __get_driver(self, unique_id: str):
+        driver_data = self.__device_driver_dao.get(unique_id)
+        gpio_driver = GPIODriver()
+        gpio_driver.connect(
+            pin=driver_data["address"], type=PinType.INPUT
+        )
+        return gpio_driver
+
+    def __create_sensor(self, entity: Entity):
+        sensor = BinarySensor(
+            name=entity.name,
+            unique_id=entity.unique_id,
+            hardware=entity.hardware,
+            icon=entity.icon,
+            entity_type="binary_sensor",
+        )
+        sensor.driver = self.__get_driver(entity.unique_id)
+        logger.debug(f"created an {sensor.__class__.__name__}")
+        return sensor
