@@ -6,10 +6,10 @@
     },
     "modbus": {
         "client": "serial",
-        "port": "/dev/ttyS0",
+        "port": "/dev/ttyAMA0",
         "baudrate": 9600
     },
-    "database": "C:\\Users\\patri\\PycharmProjects\\hassMQTT\\home_assistant.db",
+    "database": "/home/patrik/pycharm/hassMQTT/home_assistant.db",
     "logging": {
         "version": 1,
         "disable_existing_loggers": false,
