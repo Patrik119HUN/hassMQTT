@@ -53,17 +53,3 @@ class NightState(AlarmState):
             if zone.zone_type != ZoneType.MotionSensor:
                 if zone.state:
                     print("triggered")
-
-
-class AlarmDriver:
-    __zones: List[Zone] = []
-    __state: AlarmState = None
-
-    def __init__(self):
-        pass
-
-    def set_state(self, state: AlarmState):
-        self.__state = state
-
-    def request(self):
-        self.__state.handle_request()
