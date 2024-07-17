@@ -1,11 +1,12 @@
 from core.mqtt import mqtt_manager
-from core.home_assistant.mqtt_adapter import get_discovery
+from core.home_assistant.mqtt_packet import get_discovery
 from core.home_assistant.device_observer import *
 from core.mqtt.topic_builder import Topic, TopicType
 from core.device_manager import device_manager
 import json
 import asyncio
 from core.home_assistant.device_observer.observer_factory import *
+from loguru import logger
 
 observer_factory = ObserverFactory(mqtt_manager)
 
@@ -13,11 +14,15 @@ observer_factory = ObserverFactory(mqtt_manager)
 async def create_device(device):
     topic, discovery_packet = get_discovery(device)
     mqtt_manager.publish(topic, json.dumps(discovery_packet, indent=2))
-    mqtt_manager.publish(Topic.from_str(TopicType.PUBLISHER, discovery_packet["availability_topic"]), "online")
+    mqtt_manager.publish(
+        Topic.from_str(TopicType.PUBLISHER, discovery_packet["availability_topic"]),
+        "online",
+    )
     observers = observer_factory.get_observers(device, discovery_packet)
     for topic, observer in observers.items():
         subscribe_topic = Topic.from_str(TopicType.SUBSCRIBER, topic)
         mqtt_manager.add_subscriber(subscribe_topic, observer)
+    logger.debug(f"created an {device.__class__.__name__}")
 
 
 async def main():
