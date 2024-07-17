@@ -1,5 +1,6 @@
 from core.device.entity import Entity
 from core.repository import *
+from typing import Generator
 
 
 class DeviceManager:
@@ -8,7 +9,7 @@ class DeviceManager:
         self.__sensor_repository = SensorRepository()
         self.__alarm_repository = AlarmRepository()
 
-    def list(self) -> list[Entity]:
+    def list(self) -> Generator[Entity, None, None]:
         yield from self.__light_repository.list()
         yield from self.__sensor_repository.list()
 
