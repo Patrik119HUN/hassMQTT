@@ -1,12 +1,19 @@
-from core.home_assistant.device_observer import BinaryObserver
+from typing import Dict
+from core.device.entity import Entity
+from core.home_assistant.device_observer import EntityObserver
+from core.mqtt.mqtt_manager import MQTTManager
 from core.mqtt.topic_builder import Topic, TopicType
-from core.device.light import BrightnessLight
 
 
-class BrightnessObserver(BinaryObserver):
-    def update(self, topic: Topic, payload: bytes):
-        super().update(topic=topic, payload=payload)
-        brightness_state_topic = Topic.from_str(
+class BrightnessObserver(EntityObserver):
+    def __init__(
+        self, mqtt_manager: MQTTManager, topics: Dict[str, str], entity: Entity
+    ):
+        super().__init__(mqtt_manager, topics, entity)
+        self.__brightness_state_topic = Topic.from_str(
             TopicType.PUBLISHER, self._topics["brightness_state_topic"]
         )
-        self._mqtt_manager.publish(brightness_state_topic, payload)
+
+    def update(self, topic: Topic, payload: bytes):
+        self._mqtt_manager.publish(self.__brightness_state_topic, payload)
+        self._entity.brightness = int(payload)

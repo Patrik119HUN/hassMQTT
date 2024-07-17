@@ -3,9 +3,10 @@ from core.device.entity import Entity
 from core.home_assistant.device_observer import EntityObserver
 from core.mqtt.mqtt_manager import MQTTManager
 from core.mqtt.topic_builder import Topic, TopicType
-from core.device.alarm_control_panel import AlarmControlPanel
+from core.device.alarm_control_panel import *
 from threading import Thread
 import time
+
 
 class AlarmObserver(EntityObserver):
     def __init__(
@@ -25,15 +26,21 @@ class AlarmObserver(EntityObserver):
             time.sleep(1)
 
     def update(self, topic: Topic, payload: bytes):
-        if payload == b"DISARM":
-            self._mqtt_manager.publish(self.state_topic, b"disarmed")
-        if payload == b"ARM_HOME":
-            self._mqtt_manager.publish(self.state_topic, "armed_home")
-        if payload == b"ARM_AWAY":
-            self._mqtt_manager.publish(self.state_topic, "armed_away")
-        if payload == b"ARM_NIGHT":
-            self._mqtt_manager.publish(self.state_topic, "armed_night")
-        if payload == b"ARM_VACATION":
-            self._mqtt_manager.publish(self.state_topic, "armed_vacation")
-        if payload == b"ARM_CUSTOM_BYPASS":
-            self._mqtt_manager.publish(self.state_topic, "armed_custom_bypass")
+        match payload:
+            case b"DISARM":
+                self._mqtt_manager.publish(self.state_topic, b"disarmed")
+                self._entity.set_alarm(disarmed)
+            case b"ARM_HOME":
+                self._mqtt_manager.publish(self.state_topic, "armed_home")
+                self._entity.set_alarm(arm_home)
+            case b"ARM_AWAY":
+                self._mqtt_manager.publish(self.state_topic, "armed_away")
+                self._entity.set_alarm(arm_away)
+            case b"ARM_NIGHT":
+                self._mqtt_manager.publish(self.state_topic, "armed_night")
+                self._entity.set_alarm(arm_night)
+            case b"ARM_VACATION":
+                self._mqtt_manager.publish(self.state_topic, "armed_vacation")
+                self._entity.set_alarm(arm_vacation)
+            case b"ARM_CUSTOM_BYPASS":
+                self._mqtt_manager.publish(self.state_topic, "armed_custom_bypass")

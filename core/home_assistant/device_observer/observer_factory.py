@@ -7,10 +7,10 @@ from core.device.alarm_control_panel import AlarmControlPanel
 from core.mqtt.mqtt_manager import TopicObserver, MQTTManager
 
 observer_registry: Dict[type, type] = {
-    BinarySensor: BinaryObserver,
+    BinarySensor: SensorObserver,
     BinaryLight: BinaryObserver,
     BrightnessLight: BrightnessObserver,
-    RGBLight: RGBObserver,
+    RGBLight: BinaryObserver,
     AlarmControlPanel: AlarmObserver,
 }
 
@@ -36,6 +36,11 @@ class ObserverFactory:
                 observers[subscriber] = observer(self._mqtt_manager, topics, entity)
         if "command_topic" in topics:
             observers[topics["command_topic"]] = observer_registry[type(entity)](
+                self._mqtt_manager, topics, entity
+            )
+
+        if entity.entity_type == "binary_sensor":
+            observers[topics["state_topic"]] = observer_registry[BinarySensor](
                 self._mqtt_manager, topics, entity
             )
         return observers
