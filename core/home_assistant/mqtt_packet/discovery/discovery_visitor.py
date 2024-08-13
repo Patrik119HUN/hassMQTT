@@ -1,4 +1,4 @@
-from core.mqtt.topic_builder import Topic, TopicType
+from core.mqtt.topic import Topic, TopicType
 from core.device.entity import Entity
 from typing import Dict
 
