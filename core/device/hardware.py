@@ -1,8 +1,8 @@
-from dataclasses import dataclass
+from attrs import define
 from typing import Optional
 
 
-@dataclass
+@define
 class Hardware:
     name: str
     model: Optional[str] = ""
