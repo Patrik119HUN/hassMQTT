@@ -1,17 +1,17 @@
 from core.device.light.binary_light import BinaryLight
 from core.utils.clamp import clamp
-
+from core.device.entity import Entity
 MAX_LIGHT_VALUE: int = 255
 
 
-class BrightnessLight(BinaryLight):
+class BrightnessLight(Entity):
     color_mode: str = "brightness"
     __brightness: int = 0
 
     @property
     def brightness(self) -> int:
         return self.__brightness
-
+    
     @brightness.setter
     def brightness(self, brightness: int) -> None:
         """

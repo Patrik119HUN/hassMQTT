@@ -1,36 +1,21 @@
-from core.device.light.brightness_light import BrightnessLight
+from core.device.light.binary_light import BinaryLight
 from core.device.entity import Entity
-from core.device.hardware import Hardware
 from core.utils.clamp import clamp
-from core.utils.id_generator import generate_id
+from attrs import define
 
 MAX_LIGHT_VALUE: int = 255
 
 
-class RGBLight(BrightnessLight):
+@define
+class RGBLight(Entity):
+    entity_type: str = "light"
     color_mode: str = "rgb"
+
     __red: int = 255
     __green: int = 255
     __blue: int = 255
     __brightness: float = 1
     __state: bool = False
-
-    def __init__(
-        self,
-        name: str,
-        unique_id: str = generate_id(),
-        hardware: Hardware = None,
-        icon: str = None,
-        entity_type: str = "light",
-    ):
-        Entity.__init__(
-            self,
-            name=name,
-            unique_id=unique_id,
-            hardware=hardware,
-            icon=icon,
-            entity_type=entity_type,
-        )
 
     @property
     def brightness(self) -> int:
@@ -69,17 +54,17 @@ class RGBLight(BrightnessLight):
     @red.setter
     def red(self, value: int) -> None:
         self.__red = clamp(value, 0, MAX_LIGHT_VALUE)
-        self.driver.send_data(0, int(self.__red*self.__brightness))
+        self.driver.send_data(0, int(self.__red * self.__brightness))
 
     @green.setter
     def green(self, value: int) -> None:
         self.__green = clamp(value, 0, MAX_LIGHT_VALUE)
-        self.driver.send_data(1, int(self.__green*self.__brightness))
+        self.driver.send_data(1, int(self.__green * self.__brightness))
 
     @blue.setter
     def blue(self, value: int) -> None:
         self.__blue = clamp(value, 0, MAX_LIGHT_VALUE)
-        self.driver.send_data(2, int(self.__blue*self.__brightness))
+        self.driver.send_data(2, int(self.__blue * self.__brightness))
 
     @property
     def color(self) -> tuple[int, int, int]:

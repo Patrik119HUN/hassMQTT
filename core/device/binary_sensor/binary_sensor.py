@@ -2,28 +2,14 @@ from core.device.entity import Entity
 from gpiozero import DigitalInputDevice
 from core.device.hardware import Hardware
 from core.device.driver.gpio_driver import GPIODriver, PinType
-from typing import Callable
+from typing import Callable, ClassVar
+from attrs import define
 
 
+@define
 class BinarySensor(Entity):
+    entity_type: str = ("binary_sensor",)
     __state: bool = False
-
-    def __init__(
-        self,
-        name: str,
-        hardware: Hardware = None,
-        icon: str = None,
-        unique_id: str = None,
-        entity_type: str = "binary_sensor",
-    ):
-        Entity.__init__(
-            self,
-            name=name,
-            unique_id=unique_id,
-            hardware=hardware,
-            entity_type=entity_type,
-            icon=icon,
-        )
 
     def set_callback(
         self, active: Callable[[None], None], deactivated: Callable[[None], None]
