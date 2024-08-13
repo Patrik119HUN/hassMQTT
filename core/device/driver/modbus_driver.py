@@ -4,7 +4,6 @@ from pymodbus import ModbusException
 from pymodbus.client.base import ModbusBaseSyncClient
 from .abstract_driver import AbstractDriver
 
-
 class ModbusDriver(AbstractDriver):
     __id: int = 0
     __modbus: ModbusBaseSyncClient = None
@@ -41,7 +40,7 @@ class ModbusDriver(AbstractDriver):
         try:
             if type(value) is int:
                 self.__modbus.write_register(address=address, value=value, slave=self.__id)
-            else:
+            if type(value) is bool:
                 self.__modbus.write_coil(address=address, value=value, slave=self.__id)
             logger.debug(
                 f"Writing register to device at address {self.__id} with the value of {value}"
@@ -59,3 +58,5 @@ class ModbusDriver(AbstractDriver):
 
     def get_address(self):
         return self.__id
+    def __repr__(self) -> str:
+        return "modbus"
