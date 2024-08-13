@@ -2,6 +2,8 @@ from core.device.entity import Entity
 from core.config_manager import config_manager
 from core.device.binary_sensor import BinarySensor
 from core.repository.dao import HardwareDAO, DeviceDriverDAO, EntityDAO, LightDAO
+from typing import List
+
 
 class AlarmRepository:
     def __init__(self):
@@ -24,16 +26,20 @@ class AlarmRepository:
         self.__device_driver_dao.delete(unique_id)
         self.__hardware_dao.delete(unique_id)
 
-    def list(self):
+    def list(self) -> List[BinarySensor]:
+        alarm_list: List[BinarySensor] = []
         for entity in self.__entity_dao.list():
             if entity.entity_type == "sensor":
-                yield BinarySensor(
-                    name=entity.name,
-                    unique_id=entity.unique_id,
-                    hardware=entity.hardware,
-                    icon=entity.icon,
-                    entity_type="binary_sensor",
+                alarm_list.append(
+                    BinarySensor(
+                        name=entity.name,
+                        unique_id=entity.unique_id,
+                        hardware=entity.hardware,
+                        icon=entity.icon,
+                        entity_type="binary_sensor",
+                    )
                 )
+        return alarm_list
 
     def get(self, unique_id: str):
         entity = self.__entity_dao.get(unique_id)
