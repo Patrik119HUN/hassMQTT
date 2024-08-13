@@ -1,5 +1,5 @@
 from core.device.entity import Entity
-from core.mqtt.topic_builder import Topic, TopicType
+from core.mqtt.topic import Topic, TopicType
 from typing import Tuple, Dict
 from core.home_assistant.mqtt_packet.discovery import *
 
