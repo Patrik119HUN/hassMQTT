@@ -2,7 +2,7 @@ from typing import Dict
 from core.device.entity import Entity
 from core.home_assistant.device_observer import EntityObserver
 from core.mqtt.mqtt_manager import MQTTManager
-from core.mqtt.topic_builder import Topic, TopicType
+from core.mqtt.topic import Topic, TopicType
 from core.device.alarm_control_panel import *
 from threading import Thread
 import time
@@ -25,7 +25,8 @@ class AlarmObserver(EntityObserver):
                 self._mqtt_manager.publish(self.state_topic, "triggered")
             time.sleep(1)
 
-    def update(self, topic: Topic, payload: bytes):
+    def update(self, *args, **kwargs):
+        payload: bytes = kwargs["payload"]
         match payload:
             case b"DISARM":
                 self._mqtt_manager.publish(self.state_topic, b"disarmed")

@@ -2,7 +2,7 @@ from typing import Dict
 from core.device.entity import Entity
 from core.home_assistant.device_observer import EntityObserver
 from core.mqtt.mqtt_manager import MQTTManager
-from core.mqtt.topic_builder import Topic, TopicType
+from core.mqtt.topic import Topic, TopicType
 
 
 class BrightnessObserver(EntityObserver):
@@ -14,6 +14,7 @@ class BrightnessObserver(EntityObserver):
             TopicType.PUBLISHER, self._topics["brightness_state_topic"]
         )
 
-    def update(self, topic: Topic, payload: bytes):
+    def update(self, *args, **kwargs):
+        payload: bytes = kwargs["payload"]
         self._mqtt_manager.publish(self.__brightness_state_topic, payload)
-        self._entity.brightness = int(payload)
+        self._entity.brightness = int(payload.decode())

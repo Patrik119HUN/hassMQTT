@@ -2,7 +2,7 @@ from typing import Dict
 from core.device.entity import Entity
 from core.home_assistant.device_observer import EntityObserver
 from core.mqtt.mqtt_manager import MQTTManager
-from core.mqtt.topic_builder import Topic, TopicType
+from core.mqtt.topic import Topic, TopicType
 
 
 class BinaryObserver(EntityObserver):
@@ -14,6 +14,12 @@ class BinaryObserver(EntityObserver):
             TopicType.PUBLISHER, self._topics["state_topic"]
         )
 
-    def update(self, topic: Topic, payload: bytes):
+    def update(self, *args, **kwargs):
+        payload: bytes = kwargs["payload"]
         self._mqtt_manager.publish(self.__state_topic, payload)
-        self._entity.state = True if payload == b"ON" else False
+        if payload.decode() == "ON":
+            self._entity.state = True
+            print("on")
+        else:
+            print("off")
+            self._entity.state = False

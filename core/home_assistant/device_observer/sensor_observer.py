@@ -1,5 +1,5 @@
 from core.home_assistant.device_observer import EntityObserver
-from core.mqtt.topic_builder import Topic, TopicType
+from core.mqtt.topic import Topic, TopicType
 from loguru import logger
 from core.device.light import BinaryLight
 import time
@@ -26,5 +26,5 @@ class SensorObserver(EntityObserver):
     def off(self):
         self._mqtt_manager.publish(self.__state_topic, "OFF")
 
-    def update(self, topic: Topic, payload: bytes):
+    def update(self, *args, **kwargs):
         pass

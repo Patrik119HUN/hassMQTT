@@ -1,46 +1,50 @@
 from typing import Dict, TypeVar
 from core.home_assistant.device_observer import *
 from core.device.entity import Entity
-from core.device.light import *
-from core.device.binary_sensor import BinarySensor
-from core.device.alarm_control_panel import AlarmControlPanel
-from core.mqtt.mqtt_manager import TopicObserver, MQTTManager
-
-observer_registry: Dict[type, type] = {
-    BinarySensor: SensorObserver,
-    BinaryLight: BinaryObserver,
-    BrightnessLight: BrightnessObserver,
-    RGBLight: BinaryObserver,
-    AlarmControlPanel: AlarmObserver,
-}
-
-observer_dict = {
-    "brightness_command_topic": BrightnessObserver,
-    "rgb_command_topic": RGBObserver,
-}
+from core.mqtt.mqtt_manager import MQTTManager
+from core.mqtt.topic import Topic, TopicType
+from core.home_assistant.device_observer.observer_data import ObserverData
 
 B = TypeVar("B", bound=EntityObserver)
 
 
 class ObserverFactory:
-    _mqtt_manager: MQTTManager
+    def __init__(self, mqtt_manager: MQTTManager = None):
+        self._mqtt_manager = mqtt_manager
+        self.__observer_registry: Dict[Entity, ObserverData] = {}
 
-    def __init__(self, mqtt_manager: MQTTManager):
+    def set_mqtt_manager(self, mqtt_manager: MQTTManager):
         self._mqtt_manager = mqtt_manager
 
+    def register(self, device_type: type, observer_data: ObserverData):
+        self.__observer_registry[device_type] = observer_data
+
     def get_observers(self, entity: Entity, topics: Dict[str, str]):
-        observers: Dict[str, B] = {}
-        for topic, observer in observer_dict.items():
-            if topic in topics:
-                subscriber = topics[topic]
-                observers[subscriber] = observer(self._mqtt_manager, topics, entity)
-        if "command_topic" in topics:
-            observers[topics["command_topic"]] = observer_registry[type(entity)](
+        observers: Dict[Topic, B] = {}
+
+        entity_observers = self.__observer_registry[type(entity)]
+        if entity_observers.command_observer is not None:
+            subscribe_topic = Topic.from_str(
+                TopicType.SUBSCRIBER, topics["command_topic"]
+            )
+            observers[subscribe_topic] = entity_observers.command_observer(
                 self._mqtt_manager, topics, entity
             )
 
-        if entity.entity_type == "binary_sensor":
-            observers[topics["state_topic"]] = observer_registry[BinarySensor](
+        if entity_observers.state_observer is not None:
+            subscribe_topic = Topic.from_str(
+                TopicType.SUBSCRIBER, topics["state_topic"]
+            )
+            observers[subscribe_topic] = entity_observers.state_observer(
                 self._mqtt_manager, topics, entity
             )
+        if entity_observers.other_observers is not None:
+            for topic, observer in entity_observers.other_observers.items():
+                if topic in topics:
+                    subscribe_topic = Topic.from_str(
+                        TopicType.SUBSCRIBER, topics[topic]
+                    )
+                    observers[subscribe_topic] = observer(
+                        self._mqtt_manager, topics, entity
+                    )
         return observers

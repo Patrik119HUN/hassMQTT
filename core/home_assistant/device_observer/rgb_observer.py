@@ -1,7 +1,7 @@
 from core.device.entity import Entity
 from core.home_assistant.device_observer import EntityObserver
 from core.mqtt.mqtt_manager import MQTTManager
-from core.mqtt.topic_builder import Topic, TopicType
+from core.mqtt.topic import Topic, TopicType
 from typing import Dict
 
 
@@ -14,6 +14,7 @@ class RGBObserver(EntityObserver):
             TopicType.PUBLISHER, self._topics["rgb_state_topic"]
         )
 
-    def update(self, topic: Topic, payload: bytes):
+    def update(self, *args, **kwargs):
+        payload: bytes = kwargs["payload"]
         self._mqtt_manager.publish(self.__rgb_state_topic, payload)
-        self._entity.color = tuple(map(int, payload.decode("utf-8").split(",")))
+        self._entity.color = tuple(map(int, payload.decode().split(",")))
