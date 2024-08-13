@@ -1,6 +1,7 @@
 from core.device.entity import Entity
 from core.repository import *
-from typing import Generator
+from typing import Generator, List
+from itertools import chain
 
 
 class DeviceManager:
@@ -8,10 +9,12 @@ class DeviceManager:
         self.__light_repository = LightRepository()
         self.__sensor_repository = SensorRepository()
         self.__alarm_repository = AlarmRepository()
+        self.device_cache: List[Entity] = list(
+            chain(self.__light_repository.list(), self.__sensor_repository.list())
+        )
 
-    def list(self) -> Generator[Entity, None, None]:
-        yield from self.__light_repository.list()
-        yield from self.__sensor_repository.list()
+    def list(self) -> List[Entity]:
+        return self.device_cache
 
     def save(self, entity: Entity):
         self.__light_repository.save(entity)
